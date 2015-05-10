@@ -1,12 +1,15 @@
-<!DOCTYPE html><html>
-
-<head>	
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">	
 	<title>Charts-for-CompStat</title>
 	<link rel="stylesheet" type="text/css" href="./css/dashboard.css" />
 	<link rel="stylesheet" type="text/css" href="./css/topbar.css" />
 	<link rel="stylesheet" type="text/css" href="./css/global.css" />
 	<link rel="stylesheet" type="text/css" href="./css/slider.css" />
 	<link rel="stylesheet" type="text/css" href="./css/bars.css" />
+        <link rel="stylesheet" type="text/css" href="./css/entry.css" />
+
 
 	<link rel="stylesheet" type="text/css" href="./css/sparkline.css">  
   	<script src="//code.jquery.com/jquery-1.10.2.js"></script>
@@ -14,6 +17,8 @@
 	
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 	
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.css">  
+
 	
 
 	<meta name="Keywords" content="Charts-for-CompStat" />
@@ -44,7 +49,8 @@
 			<div id="dropdown-selectors">
 
 				<!-- Dates Selector -->
-				<select id="select_dates"></select>
+				<p for="amount">Report Covering the Date Range:</p>
+                                <select id="select_dates"></select>
 				<!-- Precinct Selector -->
 				<select id="select_precincts"></select>
 
@@ -54,8 +60,8 @@
 			<div id="slider-container">
 				<div id="slider-text">
 					<center>
-						<label for="amount">Report Covering the Date Range:</label>
-						<input type="text" id="date-range" readonly style="border:0; color:#f6931f; font-weight:bold;" size="30">
+						<!--<label for="amount">Report Covering the Date Range:</label> -->
+						<!--<input type="text" id="date-range" readonly style="border:0; color:#f6931f; font-weight:bold;" size="30"> -->
 						<!-- <button id="btn-range" type="button" >R</button> -->
 						<!-- <button id="btn-day" type="button" >D</button> -->
 						<!-- <button id="btn-week" type="button" >W</button> -->
@@ -71,11 +77,22 @@
 
 
 			<!-- Sparklines -->
-			<div id="sparkline1" class="sparkline"><p>All Collisions</p></div>
-			<div id="sparkline2" class="sparkline"><p>Injury Collisions</p></div>
-			<div id="sparkline3" class="sparkline"><p>Fatal Collisions</p></div>
-			<!-- <div id="sparkline4" class="sparkline"><p>Injuries</p></div> -->
-			<!-- <div id="sparkline5" class="sparkline"><p>Fatalities</p></div> -->
+
+			<span id="sparkline1" class="sparkline"></span>
+			<span id="group1" class="entry"><p class="name">all collisions</p>
+			  <p class="numbers"></p></span> <br/>
+			<span id="sparkline4" class="sparkline"></span>
+                        <span id="group4" class="entry"><p class="name">injures</p>
+                          <p class="numbers"></p></span> <br/>
+			 <span id="sparkline5" class="sparkline"></span>
+                         <span id="group5" class="entry"><p class="name">fatalities</p>
+                           <p class="numbers"></p></span><br/>
+                         <span id="sparkline6" class="sparkline"></span>
+                         <span id="group6" class="entry"><p class="name">cyclists involved</p>
+                           <p class="numbers"></p></span><br/>
+                       
+                        <!-- <div id="sparkline3" class="sparkline"><p>Injury Collisions</p></div> -->
+                        <!-- <div id="sparkline3" class="sparkline"><p>Fatal Collisions</p></div> -->
 			<!-- <div id="sparkline6" class="sparkline"><p>Cyclists Involved</p></div> -->
 			<!-- <div id="sparkline7" class="sparkline"><p>Pedestrians Involved</p></div> -->
 
@@ -83,9 +100,14 @@
 			<!-- Daily Trend Line -->
 			<br /><br /><br />
 			
-			<div id="dailytrend1" class="dailytrend"><p>All Collisions</p></div>
+			<!--<div id="dailytrend1" class="dailytrend"><p>All Collisions</p></div>
 			<div id="dailytrend2" class="dailytrend"><p>Injury Collisions</p></div>
-			<div id="dailytrend3" class="dailytrend"><p>Fatal Collisions</p></div>
+			<div id="dailytrend3" class="dailytrend"><p>Fatal Collisions</p></div>-->
+                        <div id="line-chart1"></div>
+                        <div id="line-chart2"></div>
+                        <div id="line-chart3"></div>
+
+       
 
 		</div> <!-- end: Page -->
 			
@@ -95,11 +117,24 @@
 	<!-- Load D3 js file -->
 	<script src="http://d3js.org/d3.v3.js"></script>
 
+        <!-- Load DC js file -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.11/crossfilter.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.js"></script>
+
 	<!-- Load the Dashboard js file -->
 	<script src="./js/dashboard.js"></script>
 
+
+
 	<!-- Initialize the dashboard  -->
 	<script>initDashboard();</script>
+    <!--<script>sparkline.draw2("#sparkline1","all_collisions");</script>
+
+    <!-- Actions temp -->
+  
+
+  
+
 
 </body>
 </html>
