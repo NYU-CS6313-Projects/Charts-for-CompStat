@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+  <head>	
+    <meta charset="utf-8">
+    <title>Charts-for-CompStat</title>
+    <link rel="stylesheet" type="text/css" href="./css/dashboard.css" />
+    <link rel="stylesheet" type="text/css" href="./css/topbar.css" />
+    <link rel="stylesheet" type="text/css" href="./css/global.css" />
+    <link rel="stylesheet" type="text/css" href="./css/slider.css" />
+    <link rel="stylesheet" type="text/css" href="./css/bars.css" />
+    <link rel="stylesheet" type="text/css" href="./css/sparkline.css">  
+    
+
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
+
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.css">  
+
+    <meta name="Keywords" content="Charts-for-CompStat" />
+    <meta name="Description" content="" />
+
+
+
+  </head>
+
+
+  <body>
+
+    <!-- Dahboard Container -->
+    <div id="container">
+
+      <!-- <div id="dashboard-left">
+        <center>
+          <label id="title-large-trendline" for="chart">name-of-current-trendline:</label>
+          <label id="title-barchart" for="chart">Contributing Factors:</label>
+        </center>
+        <br />
+        <div id="chart" class="chart"></div>
+      </div> -->
+
+
+      <!-- Page -->
+      <div id="dashboard-page">
+        <div id="dropdown-selectors">
+
+          <!-- Dates Selector -->
+          <select id="select_dates"></select>
+          <!-- Precinct Selector -->
+          <select id="select_precincts"></select>
+
+        </div>
+
+        <!-- Slider Container -->
+        <div id="slider-container">
+          <div id="slider-text">
+            <center>
+              <label for="amount">Report Covering the Date Range:</label>
+              <input type="text" id="date-range" readonly style="border:0; color:#f6931f; font-weight:bold;" size="30">
+              <!-- <button id="btn-range" type="button" >R</button> -->
+              <!-- <button id="btn-day" type="button" >D</button> -->
+              <!-- <button id="btn-week" type="button" >W</button> -->
+              <!-- <button id="btn-28day" type="button" >28</button> -->
+              <!-- <button id="btn-year" type="button" >Y</button> -->
+            </center>
+          </div>
+
+          <div id="slider-range"></div> 
+        </div> 
+
+        <br /><br />
+
+
+        <!-- Sparklines -->
+        <div id="sparkline1" class="sparkline"><p style="float:left;">All Collisions</p></div>
+        <div id="sparkline2" class="sparkline"><p style="float:left;">Injury Collisions</p></div>
+        <div id="sparkline3" class="sparkline"><p style="float:left;">Fatal Collisions</p></div>
+        <div id="sparkline4" class="sparkline"><p style="float:left;">Injuries</p></div>
+        <div id="sparkline5" class="sparkline"><p style="float:left;">Fatalities</p></div>
+        <div id="sparkline6" class="sparkline"><p style="float:left;">Cyclists Involved</p></div>
+        <div id="sparkline7" class="sparkline"><p style="float:left;">Pedestrians Involved</p></div>
+
+
+        <!-- Daily Trend Line -->
+        <br /><br /><br />
+
+        <div id="dailytrend1" class="dailytrend"><p>All Collisions</p>
+          <div id="sub-chart"></div>
+          <div id="sub-chart2"></div>
+        </div>
+        <div id="dailytrend2" class="dailytrend"><p>Injury Collisions</p></div>
+        <div id="dailytrend3" class="dailytrend"><p>Fatal Collisions</p></div>
+        <div id="main-chart"></div>
+        <div id="main-chart2"></div>
+       
+
+ </div> <!-- end: Page -->
+
+    </div> <!-- end: Container -->
+
+
+    <!-- Load D3 js file -->
+    <script src="http://d3js.org/d3.v3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.11/crossfilter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.js"></script>
+
+    <!-- Load the Dashboard js file -->
+    <script src="./js/dashboard.js"></script>
+
+    <!-- Initialize the dashboard  -->
+    
+     <script>
+      initDashboard();
+     
+      list = ["csv/pcts/collisions_1.csv",
+      "csv/pcts/collisions_5.csv"];
+
+      var filename = list[0];
+      var mainChart = dc.barChart('#main-chart');
+      var mainChart2 = dc.barChart('#main-chart2');
+      var sparkline1 = dc.lineChart('#sparkline1');
+      var sparkline2 = dc.lineChart('#sparkline2');
+
+      
+      var data,cf,cf_time_dim,cf_all_collisions_group, cf_injures_group;
+
+      d3.csv(filename, function(d){
+        data = d;
+
+        formatWeek = d3.time.format("%Y %U");
+        formatDate = d3.time.format("%Y-%m-%d");
+
+        // year,week,precinct,label,all_collisions,injury_collisions,fatal_collisions,injures,fatalities,cyclists_involved,pedestrians_involved,index
+        // 2012,26,1,2012-06-25 through 2012-07-01,7,0,0,0,0,0,0,0
+        // 2012,27,1,2012-07-02 through 2012-07-08,61,9,0,11,0,4,5,1
+        data.forEach(function(d){
+          d.first_day      = d.label.substr(0,10);
+          d.ts             = formatDate.parse( d.first_day );
+          d.year           = +d.year;
+          d.week           = +d.week;
+          d.index          = +d.index;
+          d.all_collisions = +d.all_collisions;
+          d.injures 	   = +d.injures;
+        });
+
+        cf = crossfilter(data);
+        cf_time_dim = cf.dimension( function(d){ return d.ts } );
+        cf_all_collisions_group = cf_time_dim.group().reduceSum( function(d){ return d.all_collisions});
+        cf_injures_group = cf_time_dim.group().reduceSum( function(d){ return d.injures } );
+
+        mainChart
+        .width(500)
+        .height(200)
+        .mouseZoomable(true)
+        .x(d3.time.scale().domain([new Date(2012,06,25), new Date(2015,04,19)]))
+        .xUnits(d3.time.week)
+        .elasticY(true)
+        .renderHorizontalGridLines(true)
+        .brushOn(false)
+        .dimension(cf_time_dim)
+        .rangeChart(sparkline1)
+        .group(cf_all_collisions_group);
+
+        mainChart2
+        .width(500)
+        .height(200)
+        .mouseZoomable(true)
+        .x(d3.time.scale().domain([new Date(2012,06,25), new Date(2015,04,19)]))
+        .xUnits(d3.time.week)
+        .elasticY(true)
+        .renderHorizontalGridLines(true)
+        .brushOn(false)
+        .dimension(cf_time_dim)
+        .rangeChart(sparkline2)
+        .group(cf_injures_group);
+
+
+        sparkline1
+        .width(400)
+        .height(100)
+        //make it adjusted
+        .x(d3.time.scale().domain([new Date(2012,06,25), new Date(2015,04,19)]))
+        //cheating
+        .margins({top: 0, right: 0, bottom: -1, left: -1})
+        .dimension(cf_time_dim)
+        .group(cf_all_collisions_group);
+
+        sparkline2
+        .width(400)
+        .height(100)
+        .x(d3.time.scale().domain([new Date(2012,06,25), new Date(2015,04,19)]))
+        .margins({top: 0, right: 0, bottom: -1, left: -1})
+        .dimension(cf_time_dim)
+        .group(cf_injures_group);
+        
+        dc.renderAll();
+
+      })
+
+    </script>
+
+  </body>
+</html>
