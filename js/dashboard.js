@@ -232,6 +232,8 @@ function initDropdownDates()
   $( "#select_dates").val(d3.max(sparkline.dataset, function(d){return d.index;}));
 
   $("#group1 p.numbers").text(sparkline.dataset[selectedIndex]["all_collisions"]);
+  $("#group2 p.numbers").text(sparkline.dataset[selectedIndex]["injury_collisions"]);
+  $("#group3 p.numbers").text(sparkline.dataset[selectedIndex]["fatal_collisions"]);
   $("#group4 p.numbers").text(sparkline.dataset[selectedIndex]["injures"]);
   $("#group5 p.numbers").text(sparkline.dataset[selectedIndex]["fatalities"]);
   $("#group6 p.numbers").text(sparkline.dataset[selectedIndex]["cyclists_involved"]);
@@ -243,10 +245,12 @@ function initDropdownDates()
 
     
     // Naive number filling
-    $("#group1 p.numbers").text(sparkline.dataset[selectedIndex]["all_collisions"]);
-    $("#group4 p.numbers").text(sparkline.dataset[selectedIndex]["injures"]);
-    $("#group5 p.numbers").text(sparkline.dataset[selectedIndex]["fatalities"]);
-    $("#group6 p.numbers").text(sparkline.dataset[selectedIndex]["cyclists_involved"]);
+     $("#group1 p.numbers").text(sparkline.dataset[selectedIndex]["all_collisions"]);
+     $("#group2 p.numbers").text(sparkline.dataset[selectedIndex]["injury_collisions"]);
+     $("#group3 p.numbers").text(sparkline.dataset[selectedIndex]["fatal_collisions"]);
+     $("#group4 p.numbers").text(sparkline.dataset[selectedIndex]["injures"]);
+     $("#group5 p.numbers").text(sparkline.dataset[selectedIndex]["fatalities"]);
+     $("#group6 p.numbers").text(sparkline.dataset[selectedIndex]["cyclists_involved"]);
 
 
      /*sparkline.draw("#sparkline2","injury_collisions");
