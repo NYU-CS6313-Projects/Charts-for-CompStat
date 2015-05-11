@@ -200,6 +200,7 @@ function initAttributeClick(){
 
   // On-Click
   $( "#group1" ).click(function() {
+    cfsparkline.init();
     var chartnumber = indexAttribute++ % MAX_CHARTS;
     var chartname = "#chart" + chartnumber;
     var attributename = "#sparkline1";
@@ -208,12 +209,12 @@ function initAttributeClick(){
     attributeClick["chart" + chartnumber].attributename = "all_collisions";
     attributeClick["chart" + chartnumber].cf_group = cf_all_collisions_group;
     attributeClick["chart" + chartnumber].cf_rangechart = sparkline1;
-    cfsparkline.init();
     cfsparkline.draw();
     // console.log(attributeClick["chart" + chartnumber]);
   }); 
 
   $( "#group4" ).click(function() {
+    cfsparkline.init();
     var chartnumber = indexAttribute++ % MAX_CHARTS;
     var chartname = "#chart" + chartnumber;
     var attributename = "#sparkline4";
@@ -222,12 +223,12 @@ function initAttributeClick(){
     attributeClick["chart" + chartnumber].attributename = "injures";
     attributeClick["chart" + chartnumber].cf_group = cf_injures_group;
     attributeClick["chart" + chartnumber].cf_rangechart = sparkline4;
-    cfsparkline.init();
     cfsparkline.draw();
     // console.log(attributeClick["chart" + chartnumber]);
   }); 
 
   $( "#group5" ).click(function() {
+    cfsparkline.init();
     var chartnumber = indexAttribute++ % MAX_CHARTS;
     var chartname = "#chart" + chartnumber;
     var attributename = "#sparkline5";
@@ -236,12 +237,12 @@ function initAttributeClick(){
     attributeClick["chart" + chartnumber].attributename = "fatalities";
     attributeClick["chart" + chartnumber].cf_group = cf_fatalities_group;
     attributeClick["chart" + chartnumber].cf_rangechart = sparkline5;
-    cfsparkline.init();
     cfsparkline.draw();
     // console.log(attributeClick["chart" + chartnumber]);
   }); 
 
   $( "#group6" ).click(function() {
+    cfsparkline.init();
     var chartnumber = indexAttribute++ % MAX_CHARTS;
     var chartname = "#chart" + chartnumber;
     var attributename = "#sparkline6";
@@ -250,7 +251,6 @@ function initAttributeClick(){
     attributeClick["chart" + chartnumber].attributename = "cyclists_involved";
     attributeClick["chart" + chartnumber].cf_group = cf_cyclists_group;
     attributeClick["chart" + chartnumber].cf_rangechart = sparkline6;
-    cfsparkline.init();
     cfsparkline.draw();
     // console.log(attributeClick["chart" + chartnumber]);
   }); 
