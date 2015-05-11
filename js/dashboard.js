@@ -14,8 +14,8 @@ var indexAttribute = 0;
 var MAX_CHARTS = 3;
 
 var cf,cf_time_dim;
-var cf_all_collisions_group, cf_injures_group, cf_fatalities_group, cf_cyclists_group;
-var sparkline1, sparkline4, sparkline5, sparkline6;
+var cf_all_collisions_group, cf_injures_group, cf_fatalities_group, cf_cyclists_group, cf_injury_group, cf_fatal_group, cf_pedestrians_group; 
+var sparkline1, sparkline2, sparkline3, sparkline4, sparkline5, sparkline6, sparkline7;
 
 // --- Sparkline Global Variables
 var sparkline = {
