@@ -10,6 +10,13 @@ var selectedIndex = null;
 var selectedDate = null;
 var parseDate = d3.time.format("%Y-%m-%d").parse;
 
+var indexAttribute = 0;
+var MAX_CHARTS = 3;
+
+var cf,cf_time_dim;
+var cf_all_collisions_group, cf_injures_group, cf_fatalities_group, cf_cyclists_group, cf_injury_group, cf_fatal_group, cf_pedestrians_group; 
+var sparkline1, sparkline2, sparkline3, sparkline4, sparkline5, sparkline6, sparkline7;
+
 // --- Sparkline Global Variables
 var sparkline = {
   top: 0,
@@ -38,6 +45,7 @@ var cfsparkline = {
   dataset: null,
   draw: null,
   loadCSV: null,
+  init: null,
 }
 
 
@@ -169,11 +177,84 @@ function initDashboard()
 
   // Load the CF Spark Line Dataset
   cfsparkline.loadCSV(sparkline.csvFileDirectory + sparkline.csvFileName + initialPrecinct + sparkline.csvFileExtension);
+
+  // Initialize the attribute clicking
+  initAttributeClick();
   
   // Load the Daily Trend Line Dataset
   // dailytrendline.loadCSV(dailytrendline.csvFileDirectory + dailytrendline.csvFileName + initialPrecinct + dailytrendline.csvFileExtension);
 }
 
+
+
+// attributeclick
+var attributeClick = {
+  chart0: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null},
+  chart1: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null},
+  chart2: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null},
+}
+
+
+function initAttributeClick(){
+  // attributeclick
+
+  // On-Click
+  $( "#group1" ).click(function() {
+    cfsparkline.init();
+    var chartnumber = indexAttribute++ % MAX_CHARTS;
+    var chartname = "#chart" + chartnumber;
+    var attributename = "#sparkline1";
+    attributeClick["chart" + chartnumber].sparkline = attributename;
+    attributeClick["chart" + chartnumber].chartname = chartname;
+    attributeClick["chart" + chartnumber].attributename = "all_collisions";
+    attributeClick["chart" + chartnumber].cf_group = cf_all_collisions_group;
+    attributeClick["chart" + chartnumber].cf_rangechart = sparkline1;
+    cfsparkline.draw();
+    // console.log(attributeClick["chart" + chartnumber]);
+  }); 
+
+  $( "#group4" ).click(function() {
+    cfsparkline.init();
+    var chartnumber = indexAttribute++ % MAX_CHARTS;
+    var chartname = "#chart" + chartnumber;
+    var attributename = "#sparkline4";
+    attributeClick["chart" + chartnumber].sparkline = attributename;
+    attributeClick["chart" + chartnumber].chartname = chartname;
+    attributeClick["chart" + chartnumber].attributename = "injures";
+    attributeClick["chart" + chartnumber].cf_group = cf_injures_group;
+    attributeClick["chart" + chartnumber].cf_rangechart = sparkline4;
+    cfsparkline.draw();
+    // console.log(attributeClick["chart" + chartnumber]);
+  }); 
+
+  $( "#group5" ).click(function() {
+    cfsparkline.init();
+    var chartnumber = indexAttribute++ % MAX_CHARTS;
+    var chartname = "#chart" + chartnumber;
+    var attributename = "#sparkline5";
+    attributeClick["chart" + chartnumber].sparkline = attributename;
+    attributeClick["chart" + chartnumber].chartname = chartname;
+    attributeClick["chart" + chartnumber].attributename = "fatalities";
+    attributeClick["chart" + chartnumber].cf_group = cf_fatalities_group;
+    attributeClick["chart" + chartnumber].cf_rangechart = sparkline5;
+    cfsparkline.draw();
+    // console.log(attributeClick["chart" + chartnumber]);
+  }); 
+
+  $( "#group6" ).click(function() {
+    cfsparkline.init();
+    var chartnumber = indexAttribute++ % MAX_CHARTS;
+    var chartname = "#chart" + chartnumber;
+    var attributename = "#sparkline6";
+    attributeClick["chart" + chartnumber].sparkline = attributename;
+    attributeClick["chart" + chartnumber].chartname = chartname;
+    attributeClick["chart" + chartnumber].attributename = "cyclists_involved";
+    attributeClick["chart" + chartnumber].cf_group = cf_cyclists_group;
+    attributeClick["chart" + chartnumber].cf_rangechart = sparkline6;
+    cfsparkline.draw();
+    // console.log(attributeClick["chart" + chartnumber]);
+  }); 
+}
 
 
 
@@ -232,9 +313,12 @@ function initDropdownDates()
   $( "#select_dates").val(d3.max(sparkline.dataset, function(d){return d.index;}));
 
   $("#group1 p.numbers").text(sparkline.dataset[selectedIndex]["all_collisions"]);
+  $("#group2 p.numbers").text(sparkline.dataset[selectedIndex]["injury_collisions"]);
+  $("#group3 p.numbers").text(sparkline.dataset[selectedIndex]["fatal_collisions"]);
   $("#group4 p.numbers").text(sparkline.dataset[selectedIndex]["injures"]);
   $("#group5 p.numbers").text(sparkline.dataset[selectedIndex]["fatalities"]);
   $("#group6 p.numbers").text(sparkline.dataset[selectedIndex]["cyclists_involved"]);
+  $("#group7 p.numbers").text(sparkline.dataset[selectedIndex]["pedestrians_involved"]);
 
   // On-click
   $( "#select_dates" ).change(function(){
@@ -243,10 +327,14 @@ function initDropdownDates()
 
     
     // Naive number filling
-    $("#group1 p.numbers").text(sparkline.dataset[selectedIndex]["all_collisions"]);
-    $("#group4 p.numbers").text(sparkline.dataset[selectedIndex]["injures"]);
-    $("#group5 p.numbers").text(sparkline.dataset[selectedIndex]["fatalities"]);
-    $("#group6 p.numbers").text(sparkline.dataset[selectedIndex]["cyclists_involved"]);
+     $("#group1 p.numbers").text(sparkline.dataset[selectedIndex]["all_collisions"]);
+     $("#group2 p.numbers").text(sparkline.dataset[selectedIndex]["injury_collisions"]);
+     $("#group3 p.numbers").text(sparkline.dataset[selectedIndex]["fatal_collisions"]);
+     $("#group4 p.numbers").text(sparkline.dataset[selectedIndex]["injures"]);
+     $("#group5 p.numbers").text(sparkline.dataset[selectedIndex]["fatalities"]);
+     $("#group6 p.numbers").text(sparkline.dataset[selectedIndex]["cyclists_involved"]);
+     $("#group7 p.numbers").text(sparkline.dataset[selectedIndex]["pedestrians_involved"]);
+
 
 
      /*sparkline.draw("#sparkline2","injury_collisions");
@@ -439,6 +527,29 @@ cfsparkline.loadCSV = function(filename)
           cyclists_involved =  +d.cyclists_involved;
           pedestrians_involved = +d.pedestrians_involved;
         });
+        
+        cfsparkline.init();
+
+        // attributeclick
+        // Initial values
+        attributeClick["chart0"].sparkline = '#sparkline1';
+        attributeClick["chart0"].chartname = '#chart0';
+        attributeClick["chart0"].attributename = "all_collisions";
+        attributeClick["chart0"].cf_group = cf_all_collisions_group;
+        attributeClick["chart0"].cf_rangechart = sparkline1;
+
+        attributeClick["chart1"].sparkline = '#sparkline2';
+        attributeClick["chart1"].chartname = '#chart1';
+        attributeClick["chart1"].attributename = "injury collisions";
+        attributeClick["chart1"].cf_group = cf_injury_group;
+        attributeClick["chart1"].cf_rangechart = sparkline2;
+
+        attributeClick["chart2"].sparkline = '#sparkline4';
+        attributeClick["chart2"].chartname = '#chart2';
+        attributeClick["chart2"].attributename = "injures";
+        attributeClick["chart2"].cf_group = cf_injures_group;
+        attributeClick["chart2"].cf_rangechart = sparkline4;
+
         cfsparkline.draw();
     });
 }
@@ -447,62 +558,61 @@ cfsparkline.loadCSV = function(filename)
 
 
 
+cfsparkline.init = function(){
+
+  // cross-filtering
+  cf = crossfilter(cfsparkline.dataset);
+  cf_time_dim = cf.dimension( function(d){ return d.ts } );
+
+  cf_all_collisions_group = cf_time_dim.group().reduceSum( function(d){ return d.all_collisions;});
+  cf_injury_group = cf_time_dim.group().reduceSum( function(d){ return d.injury_collisions } );
+  cf_fatal_group = cf_time_dim.group().reduceSum( function(d){ return d.fatal_collisions } );
+  cf_injures_group = cf_time_dim.group().reduceSum( function(d){ return d.injures } );
+  cf_fatalities_group = cf_time_dim.group().reduceSum( function(d){ return d.fatalities } );      
+  cf_cyclists_group = cf_time_dim.group().reduceSum( function(d){ return d.cyclists_involved } );
+  cf_pedestrians_group = cf_time_dim.group().reduceSum( function(d){ return d.pedestrians_involved } );
+
+  sparkline1 = dc.lineChart('#sparkline1');
+  sparkline2 = dc.lineChart('#sparkline2');
+  sparkline3 = dc.lineChart('#sparkline3');
+  sparkline4 = dc.lineChart('#sparkline4');
+  sparkline5 = dc.lineChart('#sparkline5');
+  sparkline6 = dc.lineChart('#sparkline6');
+  sparkline7 = dc.lineChart('#sparkline7');
+}
+
 cfsparkline.draw = function()
 {
   log("Drawing CF Sparkilne.", "cfsparkline.draw");
 
-  //list = ["csv/pcts/collisions_1.csv",
-  //    "csv/pcts/collisions_5.csv"];
 
-   //   var filename = list[0];
-
-
+      var lineChart0 = dc.lineChart('#line-chart0');
       var lineChart1 = dc.lineChart('#line-chart1');
       var lineChart2 = dc.lineChart('#line-chart2');
-      var lineChart3 = dc.lineChart('#line-chart3');
-      var sparkline1 = dc.lineChart('#sparkline1');
-      var sparkline4 = dc.lineChart('#sparkline4');
-      var sparkline5 = dc.lineChart('#sparkline5');
-      var sparkline6 = dc.lineChart('#sparkline6');
-
-
       
-      var cf,cf_time_dim,cf_all_collisions_group, cf_injures_group, cf_fatalities_group;
+      
+      var first_date = cfsparkline.dataset[selectedIndex].ts;
 
-      // d3.csv(filename, function(error, d){
-      //   data = d;
-
-      //   formatWeek = d3.time.format("%Y %U");
-      //   formatDate = d3.time.format("%Y-%m-%d");
-
-        // year,week,precinct,label,all_collisions,injury_collisions,fatal_collisions,injures,fatalities,cyclists_involved,pedestrians_involved,index
-        // 2012,26,1,2012-06-25 through 2012-07-01,7,0,0,0,0,0,0,0
-        // 2012,27,1,2012-07-02 through 2012-07-08,61,9,0,11,0,4,5,1
-        // data.forEach(function(d){
-        //   d.first_day      = d.label.substr(0,10);
-        //   d.ts             = formatDate.parse( d.first_day );
-        //   d.year           = +d.year;
-        //   d.week           = +d.week;
-        //   d.index          = +d.index;
-        //   d.all_collisions = +d.all_collisions;
-        //   d.injury_collisions = +d.injury_collisions;
-        //   d.fatal_collisions = +d.fatal_collisions;
-        //   d.injures 	   = +d.injures;
-        //   fatalities      = +d.fatalities;
-        //   cyclists_involved =  +d.cyclists_involved;
-        //   pedestrians_involved = +d.pedestrians_involved;
-        // });
-
-        var first_date = cfsparkline.dataset[selectedIndex].ts;
-
+        // var cf,cf_time_dim;
 
         // cross-filtering
-        cf = crossfilter(cfsparkline.dataset);
-        cf_time_dim = cf.dimension( function(d){ return d.ts } );
-        cf_all_collisions_group = cf_time_dim.group().reduceSum( function(d){ return d.all_collisions;});
-        cf_injures_group = cf_time_dim.group().reduceSum( function(d){ return d.injures } );
-        cf_fatalities_group = cf_time_dim.group().reduceSum( function(d){ return d.fatalities } );      
-	cf_cyclists_group = cf_time_dim.group().reduceSum( function(d){ return d.cyclists_involved } );
+       //  cf = crossfilter(cfsparkline.dataset);
+       //  cf_time_dim = cf.dimension( function(d){ return d.ts } );
+        
+       //  cf_all_collisions_group = cf_time_dim.group().reduceSum( function(d){ return d.all_collisions;});
+       //  cf_injures_group = cf_time_dim.group().reduceSum( function(d){ return d.injures } );
+       //  cf_fatalities_group = cf_time_dim.group().reduceSum( function(d){ return d.fatalities } );      
+	      // cf_cyclists_group = cf_time_dim.group().reduceSum( function(d){ return d.cyclists_involved } );
+
+
+
+        // cf_group0 = cf_time_dim.group().reduceSum( function(d){ return d[attributeClick.chart0.attributename];});
+        // cf_group1 = cf_time_dim.group().reduceSum( function(d){ return d[attributeClick.chart1.attributename];});
+        // cf_group2 = cf_time_dim.group().reduceSum( function(d){ return d[attributeClick.chart2.attributename];});
+
+        // attributeClick.chart0.cf_group = 
+        // cf_group1 = cf_injures_group;
+        // cf_group2 = cf_fatalities_group;
 
         // red-circle stuff          
         //var a = d3.time.scale().domain([new Date(2012,06,25),first_date]);
@@ -513,6 +623,7 @@ cfsparkline.draw = function()
         //console.log(selectedValue);    
         //var first_date = cfsparkline.dataset[selectedIndex].ts;
         
+
         sparkline1
         .width(200)
         .height(30)
@@ -522,7 +633,27 @@ cfsparkline.draw = function()
         // Neil, look at this: it should be parameters, if possible
         .dimension(cf_time_dim)
         .group(cf_all_collisions_group);
-  
+        
+         sparkline2
+        .width(200)
+        .height(30)
+        .x(d3.time.scale().domain([new Date(2012,06,25), first_date]))
+        //cheating
+        .margins({top: 0, right: 5, bottom: -1, left: -1})
+        .dimension(cf_time_dim)
+        .group(cf_injury_group);
+
+
+         sparkline3
+        .width(200)
+        .height(30)
+        .x(d3.time.scale().domain([new Date(2012,06,25), first_date]))
+        //cheating
+        .margins({top: 0, right: 5, bottom: -1, left: -1})
+        .dimension(cf_time_dim)
+        .group(cf_fatal_group);
+
+ 
         sparkline4 // to preserve order in csv 2 - injury collisions, 3 - fatal collisions
         .width(200)
         .height(30)
@@ -551,16 +682,29 @@ cfsparkline.draw = function()
         .dimension(cf_time_dim)
         .group(cf_cyclists_group);
 
+        sparkline7
+        .width(200)
+        .height(30)
+        .x(d3.time.scale().domain([new Date(2012,06,25), first_date]))
+        //cheating
+        .margins({top: 0, right: 5, bottom: -1, left: -1})
+        .dimension(cf_time_dim)
+        .group(cf_pedestrians_group);
 
-        lineChart1
+
+
+        lineChart0
         .renderArea(true)
-	.width(960)
-    	.height(150)
-    	.dimension(cf_time_dim)
+        .width(960)
+    	  .height(120)
+    	  .margins({top: 10, right: 10, bottom: 20, left: 23})
+    	  .dimension(cf_time_dim)
         // Neil, here:
         .rangeChart(sparkline1)
-        .group(cf_all_collisions_group)
-        .margins({top: 10, right: 10, bottom: 20, left: 22})
+        // .group(cf_all_collisions_group)
+        // .rangeChart(dc.lineChart(attributeClick.chart0.attributename))
+        .rangeChart(attributeClick.chart0.cf_rangechart)
+        .group(attributeClick.chart0.cf_group)
         // *********************************
         .transitionDuration(500)
         .brushOn(false)
@@ -573,34 +717,38 @@ cfsparkline.draw = function()
         .xUnits(d3.time.week)
         .xAxis();
 
-         lineChart2
+        
+        lineChart1
         .renderArea(true)
         .width(960)
-        .height(150)
-        .margins({top: 10, right: 10, bottom: 20, left: 22})
-        .dimension(cf_time_dim)
-        .rangeChart(sparkline5)
-        .group(cf_injures_group)
-        .transitionDuration(500)
-        .brushOn(false)
+        .height(120)
+        .mouseZoomable(true)
+        .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
+        //.x(d3.time.scale().domain([new Date(2012,06,25), new Date(2015,04,13)]))
+        .margins({top: 10, right: 10, bottom: 20, left: 23})
+        .xUnits(d3.time.week)
+        .elasticY(true)
         .renderHorizontalGridLines(true)
         .title(cfsparkline.dataset,function(d){
            return d.label;})
-             //+ "\nNumber of Incidents: " + d.all_collisions;})
-        .elasticY(true)
-        .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
-        .xUnits(d3.time.week)
-        .xAxis();
+        .brushOn(false)
+        .dimension(cf_time_dim)
+        // .rangeChart(sparkline4)
+        // .group(cf_injures_group);
+        .rangeChart(attributeClick.chart1.cf_rangechart)
+        .group(attributeClick.chart1.cf_group);
 
 
-         lineChart3
+         lineChart2
         .renderArea(true)
         .width(960)
-        .height(150)
-        .margins({top: 10, right: 10, bottom: 20, left: 22})
+        .height(120)
+        .margins({top: 10, right: 10, bottom: 20, left: 23})
         .dimension(cf_time_dim)
-        .rangeChart(sparkline5)
-        .group(cf_fatalities_group)
+        // .rangeChart(sparkline5)
+        // .group(cf_fatalities_group)
+        .rangeChart(attributeClick.chart2.cf_rangechart)
+        .group(attributeClick.chart2.cf_group)
         .transitionDuration(500)
         .brushOn(false)
         .renderHorizontalGridLines(true)
