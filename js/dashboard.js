@@ -556,11 +556,11 @@ cfsparkline.draw = function()
         .renderArea(true)
 	.width(960)
     	.height(150)
-    	.margins({top: 10, right: 10, bottom: 20, left: 40})
     	.dimension(cf_time_dim)
         // Neil, here:
         .rangeChart(sparkline1)
         .group(cf_all_collisions_group)
+        .margins({top: 10, right: 10, bottom: 20, left: 22})
         // *********************************
         .transitionDuration(500)
         .brushOn(false)
@@ -573,27 +573,31 @@ cfsparkline.draw = function()
         .xUnits(d3.time.week)
         .xAxis();
 
-        
-        lineChart2
+         lineChart2
         .renderArea(true)
         .width(960)
         .height(150)
-        .mouseZoomable(true)
-        .x(d3.time.scale().domain([new Date(2012,06,25), new Date(2015,04,19)]))
-        .xUnits(d3.time.week)
-        .elasticY(true)
-        .renderHorizontalGridLines(true)
-        .brushOn(false)
+        .margins({top: 10, right: 10, bottom: 20, left: 22})
         .dimension(cf_time_dim)
-        .rangeChart(sparkline4)
-        .group(cf_injures_group);
+        .rangeChart(sparkline5)
+        .group(cf_injures_group)
+        .transitionDuration(500)
+        .brushOn(false)
+        .renderHorizontalGridLines(true)
+        .title(cfsparkline.dataset,function(d){
+           return d.label;})
+             //+ "\nNumber of Incidents: " + d.all_collisions;})
+        .elasticY(true)
+        .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
+        .xUnits(d3.time.week)
+        .xAxis();
 
 
          lineChart3
         .renderArea(true)
         .width(960)
         .height(150)
-        .margins({top: 10, right: 10, bottom: 20, left: 40})
+        .margins({top: 10, right: 10, bottom: 20, left: 22})
         .dimension(cf_time_dim)
         .rangeChart(sparkline5)
         .group(cf_fatalities_group)
