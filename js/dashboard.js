@@ -189,17 +189,20 @@ function initDashboard()
 
 // attributeclick
 var attributeClick = {
-  chart0: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null},
-  chart1: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null},
-  chart2: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null},
+  chart0: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
+  chart1: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
+  chart2: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
+  chart3: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
+  chart4: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
+  chart5: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
+  chart6: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
 }
 
-
 function initAttributeClick(){
-  // attributeclick
+  log("Initializing Sparkline Clicking", "initAttributeClick");
 
   // On-Click
-  $( "#group1" ).click(function() {
+  $( "#clickgroup1" ).click(function() {
     cfsparkline.init();
     var chartnumber = indexAttribute++ % MAX_CHARTS;
     var chartname = "#chart" + chartnumber;
@@ -207,13 +210,44 @@ function initAttributeClick(){
     attributeClick["chart" + chartnumber].sparkline = attributename;
     attributeClick["chart" + chartnumber].chartname = chartname;
     attributeClick["chart" + chartnumber].attributename = "all_collisions";
+    attributeClick["chart" + chartnumber].textname = "ALL COLLISIONS";
     attributeClick["chart" + chartnumber].cf_group = cf_all_collisions_group;
     attributeClick["chart" + chartnumber].cf_rangechart = sparkline1;
     cfsparkline.draw();
-    // console.log(attributeClick["chart" + chartnumber]);
+    console.log(attributeClick["chart" + chartnumber]);
   }); 
 
-  $( "#group4" ).click(function() {
+  $( "#clickgroup2" ).click(function() {
+    cfsparkline.init();
+    var chartnumber = indexAttribute++ % MAX_CHARTS;
+    var chartname = "#chart" + chartnumber;
+    var attributename = "#sparkline2";
+    attributeClick["chart" + chartnumber].sparkline = attributename;
+    attributeClick["chart" + chartnumber].chartname = chartname;
+    attributeClick["chart" + chartnumber].attributename = "injury_collisions";
+    attributeClick["chart" + chartnumber].textname = "INJURY COLLISIONS";
+    attributeClick["chart" + chartnumber].cf_group = cf_injury_group;
+    attributeClick["chart" + chartnumber].cf_rangechart = sparkline2;
+    cfsparkline.draw();
+    console.log(attributeClick["chart" + chartnumber]);
+  });
+
+  $( "#clickgroup3" ).click(function() {
+    cfsparkline.init();
+    var chartnumber = indexAttribute++ % MAX_CHARTS;
+    var chartname = "#chart" + chartnumber;
+    var attributename = "#sparkline3";
+    attributeClick["chart" + chartnumber].sparkline = attributename;
+    attributeClick["chart" + chartnumber].chartname = chartname;
+    attributeClick["chart" + chartnumber].attributename = "fatal_collisions";
+    attributeClick["chart" + chartnumber].textname = "FATAL COLLISIONS";
+    attributeClick["chart" + chartnumber].cf_group = cf_fatal_group;
+    attributeClick["chart" + chartnumber].cf_rangechart = sparkline3;
+    cfsparkline.draw();
+    console.log(attributeClick["chart" + chartnumber]);
+  });
+
+  $( "#clickgroup4" ).click(function() {
     cfsparkline.init();
     var chartnumber = indexAttribute++ % MAX_CHARTS;
     var chartname = "#chart" + chartnumber;
@@ -221,13 +255,14 @@ function initAttributeClick(){
     attributeClick["chart" + chartnumber].sparkline = attributename;
     attributeClick["chart" + chartnumber].chartname = chartname;
     attributeClick["chart" + chartnumber].attributename = "injures";
+    attributeClick["chart" + chartnumber].textname = "INJURIES";
     attributeClick["chart" + chartnumber].cf_group = cf_injures_group;
     attributeClick["chart" + chartnumber].cf_rangechart = sparkline4;
     cfsparkline.draw();
-    // console.log(attributeClick["chart" + chartnumber]);
+    console.log(attributeClick["chart" + chartnumber]);
   }); 
 
-  $( "#group5" ).click(function() {
+  $( "#clickgroup5" ).click(function() {
     cfsparkline.init();
     var chartnumber = indexAttribute++ % MAX_CHARTS;
     var chartname = "#chart" + chartnumber;
@@ -235,13 +270,14 @@ function initAttributeClick(){
     attributeClick["chart" + chartnumber].sparkline = attributename;
     attributeClick["chart" + chartnumber].chartname = chartname;
     attributeClick["chart" + chartnumber].attributename = "fatalities";
+    attributeClick["chart" + chartnumber].textname = "FATALITIES";
     attributeClick["chart" + chartnumber].cf_group = cf_fatalities_group;
     attributeClick["chart" + chartnumber].cf_rangechart = sparkline5;
     cfsparkline.draw();
-    // console.log(attributeClick["chart" + chartnumber]);
+    console.log(attributeClick["chart" + chartnumber]);
   }); 
 
-  $( "#group6" ).click(function() {
+  $( "#clickgroup6" ).click(function() {
     cfsparkline.init();
     var chartnumber = indexAttribute++ % MAX_CHARTS;
     var chartname = "#chart" + chartnumber;
@@ -249,11 +285,27 @@ function initAttributeClick(){
     attributeClick["chart" + chartnumber].sparkline = attributename;
     attributeClick["chart" + chartnumber].chartname = chartname;
     attributeClick["chart" + chartnumber].attributename = "cyclists_involved";
+    attributeClick["chart" + chartnumber].textname = "CYCLISTS INVOLVED";
     attributeClick["chart" + chartnumber].cf_group = cf_cyclists_group;
     attributeClick["chart" + chartnumber].cf_rangechart = sparkline6;
     cfsparkline.draw();
-    // console.log(attributeClick["chart" + chartnumber]);
+    console.log(attributeClick["chart" + chartnumber]);
   }); 
+
+  $( "#clickgroup7" ).click(function() {
+    cfsparkline.init();
+    var chartnumber = indexAttribute++ % MAX_CHARTS;
+    var chartname = "#chart" + chartnumber;
+    var attributename = "#sparkline7";
+    attributeClick["chart" + chartnumber].sparkline = attributename;
+    attributeClick["chart" + chartnumber].chartname = chartname;
+    attributeClick["chart" + chartnumber].attributename = "pedestrians_involved";
+    attributeClick["chart" + chartnumber].textname = "PEDESTRIANS INVOLVED";
+    attributeClick["chart" + chartnumber].cf_group = cf_pedestrians_group;
+    attributeClick["chart" + chartnumber].cf_rangechart = sparkline7;
+    cfsparkline.draw();
+    console.log(attributeClick["chart" + chartnumber]);
+  });
 }
 
 
@@ -277,7 +329,7 @@ function initPrecinctSelect()
     var csvFileNumber = $("#select_precincts").val();
 
     // Load the Daily Trend Line Dataset
-    dailytrendline.loadCSV(dailytrendline.csvFileDirectory + dailytrendline.csvFileName + csvFileNumber + dailytrendline.csvFileExtension);
+    // dailytrendline.loadCSV(dailytrendline.csvFileDirectory + dailytrendline.csvFileName + csvFileNumber + dailytrendline.csvFileExtension);
 
     // Load the Spark Line Dataset
     sparkline.loadCSV(sparkline.csvFileDirectory + sparkline.csvFileName + csvFileNumber + sparkline.csvFileExtension);
@@ -299,7 +351,7 @@ function initPrecinctSelect()
 */
 function initDropdownDates()
 {  
-  console.log("init dates");
+  log("Initializing Dropdown Dates", "initDropdownDates");
   // Append each of the dates to the dropdown
   sparkline.dataset.forEach(function(d){$( "<option value=\"" + d.index + "\">" + d.label + "</option>" ).appendTo( $( "#select_dates" ) );});
   
@@ -357,20 +409,15 @@ function initDropdownDates()
 
 
     // TODO: make this show the actual date being loaded, not the index number
-    console.log(selectedIndex)
+    // console.log(selectedIndex)
 
     // Redraw all sparklines
     // sparkline.redraw();
     cfsparkline.loadCSV(sparkline.csvFileDirectory + sparkline.csvFileName + initialPrecinct + sparkline.csvFileExtension);
     largetrendline.redraw();
   });
-
-  log("Initialize Dropdown Dates", "initDropdownDates");
 }
 
-
-
-console.log(selectedIndex);
 
 
 
@@ -541,15 +588,39 @@ cfsparkline.loadCSV = function(filename)
 
         attributeClick["chart1"].sparkline = '#sparkline2';
         attributeClick["chart1"].chartname = '#chart1';
-        attributeClick["chart1"].attributename = "injury collisions";
+        attributeClick["chart1"].attributename = "injury_collisions";
         attributeClick["chart1"].cf_group = cf_injury_group;
         attributeClick["chart1"].cf_rangechart = sparkline2;
 
-        attributeClick["chart2"].sparkline = '#sparkline4';
+        attributeClick["chart2"].sparkline = '#sparkline3';
         attributeClick["chart2"].chartname = '#chart2';
-        attributeClick["chart2"].attributename = "injures";
-        attributeClick["chart2"].cf_group = cf_injures_group;
-        attributeClick["chart2"].cf_rangechart = sparkline4;
+        attributeClick["chart2"].attributename = "fatal_collisions";
+        attributeClick["chart2"].cf_group = cf_fatal_group;
+        attributeClick["chart2"].cf_rangechart = sparkline2;
+
+        attributeClick["chart3"].sparkline = '#sparkline4';
+        attributeClick["chart3"].chartname = '#chart3';
+        attributeClick["chart3"].attributename = "injures";
+        attributeClick["chart3"].cf_group = cf_injures_group;
+        attributeClick["chart3"].cf_rangechart = sparkline4;
+
+        attributeClick["chart4"].sparkline = '#sparkline5';
+        attributeClick["chart4"].chartname = '#chart4';
+        attributeClick["chart4"].attributename = "fatalities";
+        attributeClick["chart4"].cf_group = cf_fatalities_group;
+        attributeClick["chart4"].cf_rangechart = sparkline2;
+
+        attributeClick["chart5"].sparkline = '#sparkline6';
+        attributeClick["chart5"].chartname = '#chart5';
+        attributeClick["chart5"].attributename = "cyclists_involved";
+        attributeClick["chart5"].cf_group = cf_cyclists_group;
+        attributeClick["chart5"].cf_rangechart = sparkline2;
+
+        attributeClick["chart6"].sparkline = '#sparkline7';
+        attributeClick["chart6"].chartname = '#chart6';
+        attributeClick["chart6"].attributename = "pedestrians_involved";
+        attributeClick["chart6"].cf_group = cf_pedestrians_group;
+        attributeClick["chart6"].cf_rangechart = sparkline2;
 
         cfsparkline.draw();
     });
@@ -593,36 +664,6 @@ cfsparkline.draw = function()
       
       
       var first_date = cfsparkline.dataset[selectedIndex].ts;
-
-        // var cf,cf_time_dim;
-
-        // cross-filtering
-       //  cf = crossfilter(cfsparkline.dataset);
-       //  cf_time_dim = cf.dimension( function(d){ return d.ts } );
-        
-       //  cf_all_collisions_group = cf_time_dim.group().reduceSum( function(d){ return d.all_collisions;});
-       //  cf_injures_group = cf_time_dim.group().reduceSum( function(d){ return d.injures } );
-       //  cf_fatalities_group = cf_time_dim.group().reduceSum( function(d){ return d.fatalities } );      
-	      // cf_cyclists_group = cf_time_dim.group().reduceSum( function(d){ return d.cyclists_involved } );
-
-
-
-        // cf_group0 = cf_time_dim.group().reduceSum( function(d){ return d[attributeClick.chart0.attributename];});
-        // cf_group1 = cf_time_dim.group().reduceSum( function(d){ return d[attributeClick.chart1.attributename];});
-        // cf_group2 = cf_time_dim.group().reduceSum( function(d){ return d[attributeClick.chart2.attributename];});
-
-        // attributeClick.chart0.cf_group = 
-        // cf_group1 = cf_injures_group;
-        // cf_group2 = cf_fatalities_group;
-
-        // red-circle stuff          
-        //var a = d3.time.scale().domain([new Date(2012,06,25),first_date]);
-        //var b = d3.scale.linear().domain(d3.extent(cfsparkline.dataset, function(d){return d.all_collisions;}));
-        //selectedDate = a(first_date);
-        //selectedValue = b(cfsparkline.dataset[selectedIndex].all_collisions);
-        //console.log(selectedDate);
-        //console.log(selectedValue);    
-        //var first_date = cfsparkline.dataset[selectedIndex].ts;
         
 
         sparkline1
