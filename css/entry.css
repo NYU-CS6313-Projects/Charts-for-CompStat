@@ -1,3 +1,11 @@
 .numbers  {
   color: #f00;
 }
+
+.name{
+	right: auto;
+}
+
+table.products td.price {
+  text-align: right;
+}

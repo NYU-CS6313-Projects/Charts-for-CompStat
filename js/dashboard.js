@@ -312,13 +312,13 @@ function initDropdownDates()
   // Set the current date range to the most recent date
   $( "#select_dates").val(d3.max(sparkline.dataset, function(d){return d.index;}));
 
-  $("#group1 p.numbers").text(sparkline.dataset[selectedIndex]["all_collisions"]);
-  $("#group2 p.numbers").text(sparkline.dataset[selectedIndex]["injury_collisions"]);
-  $("#group3 p.numbers").text(sparkline.dataset[selectedIndex]["fatal_collisions"]);
-  $("#group4 p.numbers").text(sparkline.dataset[selectedIndex]["injures"]);
-  $("#group5 p.numbers").text(sparkline.dataset[selectedIndex]["fatalities"]);
-  $("#group6 p.numbers").text(sparkline.dataset[selectedIndex]["cyclists_involved"]);
-  $("#group7 p.numbers").text(sparkline.dataset[selectedIndex]["pedestrians_involved"]);
+  $("#number1").text(sparkline.dataset[selectedIndex]["all_collisions"]);
+  $("#number2").text(sparkline.dataset[selectedIndex]["injury_collisions"]);
+  $("#number3").text(sparkline.dataset[selectedIndex]["fatal_collisions"]);
+  $("#number4").text(sparkline.dataset[selectedIndex]["injures"]);
+  $("#number5").text(sparkline.dataset[selectedIndex]["fatalities"]);
+  $("#number6").text(sparkline.dataset[selectedIndex]["cyclists_involved"]);
+  $("#number7").text(sparkline.dataset[selectedIndex]["pedestrians_involved"]);
 
   // On-click
   $( "#select_dates" ).change(function(){
@@ -327,13 +327,14 @@ function initDropdownDates()
 
     
     // Naive number filling
-     $("#group1 p.numbers").text(sparkline.dataset[selectedIndex]["all_collisions"]);
-     $("#group2 p.numbers").text(sparkline.dataset[selectedIndex]["injury_collisions"]);
-     $("#group3 p.numbers").text(sparkline.dataset[selectedIndex]["fatal_collisions"]);
-     $("#group4 p.numbers").text(sparkline.dataset[selectedIndex]["injures"]);
-     $("#group5 p.numbers").text(sparkline.dataset[selectedIndex]["fatalities"]);
-     $("#group6 p.numbers").text(sparkline.dataset[selectedIndex]["cyclists_involved"]);
-     $("#group7 p.numbers").text(sparkline.dataset[selectedIndex]["pedestrians_involved"]);
+       
+    $("#number1").text(sparkline.dataset[selectedIndex]["all_collisions"]);
+    $("#number2").text(sparkline.dataset[selectedIndex]["injury_collisions"]);
+    $("#number3").text(sparkline.dataset[selectedIndex]["fatal_collisions"]);
+    $("#number4").text(sparkline.dataset[selectedIndex]["injures"]);
+    $("#number5").text(sparkline.dataset[selectedIndex]["fatalities"]);
+    $("#number6").text(sparkline.dataset[selectedIndex]["cyclists_involved"]);
+    $("#number7").text(sparkline.dataset[selectedIndex]["pedestrians_involved"]);
 
 
 
