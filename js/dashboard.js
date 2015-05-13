@@ -394,7 +394,6 @@ cfsparkline.init = function(){
 
   // Render all DC objects
   dc.renderAll();
->>>>>>> master
 }
 
 
