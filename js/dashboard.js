@@ -199,26 +199,25 @@ cfdates.loadCSV = function(filename){
   log("Loading Sparkline CSV.", "sparkline.loadCSV" + ": " + filename);
   
   cfdates.dataset = [];
-
   
   d3.csv(filename,
     function(error, data) {            
         data.forEach(function(d,i)
         {
           cfdates.dataset.push({
-            all_collisions: +d.all_collisions,
-            injury_collisions: +d.injury_collisions,
-            fatal_collisions: +d.fatal_collisions,
-            injures: +d.injures,
-            fatalities: +d.fatalities,
-            cyclists_involved: +d.cyclists_involved,
+            all_collisions:       +d.all_collisions,
+            injury_collisions:    +d.injury_collisions,
+            fatal_collisions:     +d.fatal_collisions,
+            injures:              +d.injures,
+            fatalities:           +d.fatalities,
+            cyclists_involved:    +d.cyclists_involved,
             pedestrians_involved: +d.pedestrians_involved,
-            year: +d.year,
-            week: +d.week,
-            row_number: +d.row_number,
-            label: d.label,
-            index: +d.index,
-            date: parseDate(d.label.slice(19,30)),
+            year:                 +d.year,
+            week:                 +d.week,
+            row_number:           +d.row_number,
+            label:                d.label,
+            index:                +d.index,
+            date:                 parseDate(d.label.slice(19,30)),
           })
 
     }); //data.forEach
@@ -333,6 +332,7 @@ cfsparkline.loadCSV = function(filename){
         cfsparkline.init();
     });
 }
+
 
 
 
