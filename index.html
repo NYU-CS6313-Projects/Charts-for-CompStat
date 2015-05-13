@@ -32,17 +32,7 @@
 <body>
 
 	<!-- Dahboard Container -->
-	<div id="container">
-
-		<!-- <div id="dashboard-left">
-			<center>
-				<label id="title-large-trendline" for="chart">name-of-current-trendline:</label>
-				<label id="title-barchart" for="chart">Contributing Factors:</label>
-			</center>
-			<br />
-			<div id="chart" class="chart"></div>
-		</div> -->
-	
+	<div id="container">	
 
 		<!-- Page -->
 		<div id="dashboard-page">
@@ -56,82 +46,87 @@
 
 			</div>
 
-			<!-- Slider Container -->
-			<div id="slider-container">
-				<div id="slider-text">
-					<center>
-						<!--<label for="amount">Report Covering the Date Range:</label> -->
-						<!--<input type="text" id="date-range" readonly style="border:0; color:#f6931f; font-weight:bold;" size="30"> -->
-						<!-- <button id="btn-range" type="button" >R</button> -->
-						<!-- <button id="btn-day" type="button" >D</button> -->
-						<!-- <button id="btn-week" type="button" >W</button> -->
-						<!-- <button id="btn-28day" type="button" >28</button> -->
-						<!-- <button id="btn-year" type="button" >Y</button> -->
-					</center>
-				</div>
-
-				<div id="slider-range"></div> 
-			</div> 
 
 			<br /><br />
 
 
 			<!-- Sparklines -->
+	<div style="width: 100%">
+
+		<div style="width: 50%;float:left;">
+			<table class="products">
+				<tr>
+					<td><span id="sparkline1" class="sparkline"><td></span>
+					<td><p id="clickgroup1"class="name">ALL COLLISIONS<td></p>
+					<td><p id="number1" class="numbers"><td></p>
+				</tr>
+
+				<tr>
+					<td><span id="sparkline2" class="sparkline"><td></span>
+					<td><p id="clickgroup2" class="name">INJURY COLLISIONS<td></p>
+					<td><p id="number2" class="numbers"><td></p>
+				</tr>
+
+				<tr>
+					<td><span id="sparkline3" class="sparkline"><td></span>
+					<td><p id="clickgroup3" class="name">FATAL COLLISIONS<td></p>
+					<td><p id="number3" class="numbers"><td></p>
+				</tr>
+
+				<tr>
+					<td><span id="sparkline4" class="sparkline"><td></span>
+					<td><p id="clickgroup4" class="name">INJURIES<td></p>
+					<td><p id="number4" class="numbers" align="center"><td></p>
+				</tr>
+
+				<tr>
+					<td><span id="sparkline5" class="sparkline"><td></span>
+					<td><p id="clickgroup5" class="name">FATALITIES<td></p>
+					<td><p id="number5" class="numbers" align="center"><td></p>
+				</tr>
+
+				<tr>
+					<td><span id="sparkline6" class="sparkline"><td></span>
+					<td><p id="clickgroup6" class="name">CYCLIST INVOLVED<td></p>
+					<td><p id="number6" class="numbers" align="center"><td></p>
+				</tr>
+
+				<tr>
+					<td><span id="sparkline7" class="sparkline"><td></span>
+					<td><p id="clickgroup7" class="name">PEDESTRIANS INVOLVED<td></p>
+					<td><p id="number7" class="numbers" align="center"><td></p>
+				</tr>
+			</table>
+		</div>
+
+		<div style="width: 50%;height:250px;float:right;">
+			<div id="barchart1"><p>Barchart 1</p></div>
+			<div id="barchart2"><p>Barchart 2</p></div>
+			<div id="barchart3"><p>Barchart 3</p></div>
+			<!-- <div id="barchart4"><p>Barchart 4</p></div> -->
+			<!-- <div id="barchart5"><p>Barchart 5</p></div> -->
+			<!-- <div id="barchart6"><p>Barchart 6</p></div> -->
+			<!-- <div id="barchart7"><p>Barchart 7</p></div> -->
+		</div>
+
+	</div>
 
 
-		<table class="products">
-	<tr>
-		<td><span id="sparkline1" class="sparkline"><td></span>
-		<td><p class="name">ALL COLLISIONS<td></p>
-		<td><p id="number1" class="numbers"><td></p>
-	</tr>
 
-	<tr>
-		<td><span id="sparkline2" class="sparkline"><td></span>
-		<td><p class="name">INJURY COLLISIONS<td></p>
-		<td><p id="number2" class="numbers"><td></p>
-	</tr>
+		<div><br /><br /><br /></div>
 
-	<tr>
-		<td><span id="sparkline3" class="sparkline"><td></span>
-		<td><p class="name">FATAL COLLISIONS<td></p>
-		<td><p id="number3" class="numbers"><td></p>
-	</tr>
-
-	<tr>
-		<td><span id="sparkline4" class="sparkline"><td></span>
-		<td><p class="name">INJURIES<td></p>
-		<td><p id="number4" class="numbers" align="center"><td></p>
-	</tr>
-
-	<tr>
-		<td><span id="sparkline5" class="sparkline"><td></span>
-		<td><p class="name">FATALITIES<td></p>
-		<td><p id="number5" class="numbers" align="center"><td></p>
-	</tr>
-
-	<tr>
-		<td><span id="sparkline6" class="sparkline"><td></span>
-		<td><p class="name">CYCLIST INVOLVED<td></p>
-		<td><p id="number6" class="numbers" align="center"><td></p>
-	</tr>
-
-	<tr>
-		<td><span id="sparkline7" class="sparkline"><td></span>
-		<td><p class="name">PEDESTRIANS INVOLVED<td></p>
-		<td><p id="number7" class="numbers" align="center"><td></p>
-	</tr>
-</table>
-
-
-
-		<br /><br /><br />
+		<div>
 		
-	    <p>ALL COLLISIONS</p><div id="line-chart0"></div>
-	    <p>INJURY COLLISIONS</p><div id="line-chart1"></div>
-	    <p>INJURIES</p><div id="line-chart2"></div>
+		    <p id="text-chart0">ALL COLLISIONS</p>    
+		    <div id="line-chart0"></div>
+		    
+		    <p id="text-chart1">INJURY COLLISIONS</p>
+		    <div id="line-chart1"></div>
+		    
+		    <p id="text-chart2">INJURIES</p>
+		    <div id="line-chart2"></div>
 
-       
+       </div>
 
 		</div> <!-- end: Page -->
 			
@@ -141,9 +136,9 @@
 	<!-- Load D3 js file -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.js"></script>
 
-        <!-- Load DC js file -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.11/crossfilter.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.js"></script>
+    <!-- Load DC js file -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.11/crossfilter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.js"></script>
 
 	<!-- Load the Dashboard js file -->
 	<script src="./js/dashboard.js"></script>
