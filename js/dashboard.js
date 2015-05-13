@@ -5,9 +5,8 @@
 // --- File Globals
 var thisFileName = "dashboard.js";
 var list_of_precincts = [1,5,6,7,9,10,13,14,17,18,19,20,22,23,24,25,26,28,30,32,33,34,40,41,42,43,44,45,46,47,48,49,50,52,60,61,62,63,66,67,68,69,70,71,72,73,75,76,77,78,79,81,83,84,88,90,94,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,120,121,122,123];
-var initialPrecinct = 1;
-var selectedIndex = null;
-var selectedDate = null;
+var selected_index = null;
+var selected_date = null;
 var parseDate = d3.time.format("%Y-%m-%d").parse;
 
 var indexAttribute = 0;
@@ -15,30 +14,21 @@ var MAX_CHARTS = 3;
 
 var cf,cf_time_dim;
 var cf_all_collisions_group, cf_injures_group, cf_fatalities_group, cf_cyclists_group, cf_injury_group, cf_fatal_group, cf_pedestrians_group; 
+
 var sparkline1, sparkline2, sparkline3, sparkline4, sparkline5, sparkline6, sparkline7;
 
+var lineChart0, lineChart1, lineChart2;
+
+var most_recent_date, earliest_date;
+
 // --- Sparkline Global Variables
-var sparkline = {
-  top: 0,
-  right: 10,
-  bottom: 0,
-  left: 10,
-  width: 0,
-  height: 0,  
-  dataset: null,
-  draw: null,
-  redraw: null,
+var cfdates = {
   loadCSV: null,
   initDropdownDates: null,
   csvFileDirectory: "./csv/pcts/",
   csvFileName: "collisions_",
   csvFileExtension: ".csv",
-  dateArray: null,
 };
-
-
-sparkline.width = 150 - sparkline.left - sparkline.right,
-sparkline.height = 25 - sparkline.top - sparkline.bottom;
 
 
 var cfsparkline = {
@@ -46,88 +36,30 @@ var cfsparkline = {
   draw: null,
   loadCSV: null,
   init: null,
-}
-
-
-
-// --- Date Slider Global Variables
-var dateslider = {
-  draw: null,
-  dateArray: null,
-  indexLow: null,
-  indexHigh: null,
-  indexLowNumber: null,
-  indexHighNumber: null,
-  dateselector: 0,
-  rangerange: 0,
-  rangeday: 1,
-  rangeweek: 7,
-  range28day: 28,
-  rangeyear: 365,
-  initButtons: null,
-}
-
-dateslider.dateArray = [];
-
-
-
-
-
-// --- Bar Chart Global Variables
-var barchart = {
-  contributing_factors: [],
-  redraw: null,
-}
-
-
-
-
-
-// --- Daily trend line
-var dailytrendline = {
-  dataset: null,
-  redraw: null,
-  loadCSV: null,
+  drawsparkline: null,
+  drawlinechart: null,
+  initialPrecinct: 1,
   csvFileDirectory: "./csv/pcts/",
   csvFileName: "collisions_",
   csvFileExtension: ".csv",
-  width: 0,
-  height: 0,
-  left: 30,
-  right: 10,
-  top: 10,
-  bottom: 10,
+  width: 200,
+  height: 30,
+  top: 0, 
+  right: 5, 
+  bottom: -1, 
+  left: -1,
 }
 
-dailytrendline.dataset = [];
+// TODO: populate the attribute dropdown with names.  If you select an attribute then remove it from the choices of the others
+//var attribute_names = ['ALL COLLISIONS','INJURY COLLISIONS','FATAL COLLISIONS','INJURIES','FATALITIES','CYCLISTS INVOLVED','PEDESTRIANS INVOLVED'];
 
-dailytrendline.width = 950 - dailytrendline.left - dailytrendline.right,
-dailytrendline.height = 100 - dailytrendline.top - dailytrendline.bottom;
-
-
-
-
-
-
-// --- Daily trend line
-var largetrendline = {
-  dataset: null,
-  redraw: null,
-  loadCSV: null,
-  csvFileDirectory: "./csv/pcts/",
-  csvFileName: "collisions_",
-  csvFileExtension: ".csv",
-  width: 0,
-  height: 0,
-  left: 30,
-  right: 10,
-  top: 10,
-  bottom: 10,
-}
-
-
-largetrendline.width = 950 - largetrendline.left - largetrendline.right,
-largetrendline.height = 100 - largetrendline.top - largetrendline.bottom;
+var attribute = {"1" : {sparkline : null, group : null},
+                 "2" : {sparkline : null, group : null},
+                 "3" : {sparkline : null, group : null},
+                 "4" : {sparkline : null, group : null},
+                 "5" : {sparkline : null, group : null},
+                 "6" : {sparkline : null, group : null},
+                 "7" : {sparkline : null, group : null}}
 
 
 
@@ -137,13 +69,11 @@ largetrendline.height = 100 - largetrendline.top - largetrendline.bottom;
 
 
 
-/*  Logging function for displaying the filename and function calling the log
- *  @param:  string    log message
- *  @param:  string    current file name
- *  @return: None
-*/
-function log(m, f)
-{
+//---------------------------------------------------------------------------------//
+//                          FUNCTION LOG TO CONSOLE
+//---------------------------------------------------------------------------------//
+function log(m, f){
+
   var message;
 
   if(f.length == 0)
@@ -161,163 +91,41 @@ function log(m, f)
 
 
 
-/*  Run this first to initialize the dashboard
- *  @param:  None
- *  @return: None
-*/
-function initDashboard()
-{
+
+//---------------------------------------------------------------------------------//
+//                                  INIT DASHBOARD
+//---------------------------------------------------------------------------------//
+function initDashboard(){
+
   log("Initializing", "initDashboard");
 
   // Initialize the precinct dropdown
   initPrecinctSelect();
 
-  // Load the Spark Line Dataset
-  sparkline.loadCSV(sparkline.csvFileDirectory + sparkline.csvFileName + initialPrecinct + sparkline.csvFileExtension);
+  // Initialize attribute change dropdown
+  initAttributesSelect();
+
+  // Load the dates for the dropdown menu
+  // Note: this was the oroginal load csv function for sparklines but after changes it was still necessary to keep
+  // the code functioning properly.  Load times are not an issue
+  cfdates.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
 
   // Load the CF Spark Line Dataset
-  cfsparkline.loadCSV(sparkline.csvFileDirectory + sparkline.csvFileName + initialPrecinct + sparkline.csvFileExtension);
-
-  // Initialize the attribute clicking
-  initAttributeClick();
-  
-  // Load the Daily Trend Line Dataset
-  // dailytrendline.loadCSV(dailytrendline.csvFileDirectory + dailytrendline.csvFileName + initialPrecinct + dailytrendline.csvFileExtension);
-}
-
-
-
-// attributeclick
-var attributeClick = {
-  chart0: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
-  chart1: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
-  chart2: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
-  chart3: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
-  chart4: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
-  chart5: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
-  chart6: {sparkline : null, chartname : null, attributename : null, cf_group : null, cf_rangechart : null, textname : null},
-}
-
-function initAttributeClick(){
-  log("Initializing Sparkline Clicking", "initAttributeClick");
-
-  // On-Click
-  $( "#clickgroup1" ).click(function() {
-    cfsparkline.init();
-    var chartnumber = indexAttribute++ % MAX_CHARTS;
-    var chartname = "#chart" + chartnumber;
-    var attributename = "#sparkline1";
-    attributeClick["chart" + chartnumber].sparkline = attributename;
-    attributeClick["chart" + chartnumber].chartname = chartname;
-    attributeClick["chart" + chartnumber].attributename = "all_collisions";
-    attributeClick["chart" + chartnumber].textname = "ALL COLLISIONS";
-    attributeClick["chart" + chartnumber].cf_group = cf_all_collisions_group;
-    attributeClick["chart" + chartnumber].cf_rangechart = sparkline1;
-    cfsparkline.draw();
-    console.log(attributeClick["chart" + chartnumber]);
-  }); 
-
-  $( "#clickgroup2" ).click(function() {
-    cfsparkline.init();
-    var chartnumber = indexAttribute++ % MAX_CHARTS;
-    var chartname = "#chart" + chartnumber;
-    var attributename = "#sparkline2";
-    attributeClick["chart" + chartnumber].sparkline = attributename;
-    attributeClick["chart" + chartnumber].chartname = chartname;
-    attributeClick["chart" + chartnumber].attributename = "injury_collisions";
-    attributeClick["chart" + chartnumber].textname = "INJURY COLLISIONS";
-    attributeClick["chart" + chartnumber].cf_group = cf_injury_group;
-    attributeClick["chart" + chartnumber].cf_rangechart = sparkline2;
-    cfsparkline.draw();
-    console.log(attributeClick["chart" + chartnumber]);
-  });
-
-  $( "#clickgroup3" ).click(function() {
-    cfsparkline.init();
-    var chartnumber = indexAttribute++ % MAX_CHARTS;
-    var chartname = "#chart" + chartnumber;
-    var attributename = "#sparkline3";
-    attributeClick["chart" + chartnumber].sparkline = attributename;
-    attributeClick["chart" + chartnumber].chartname = chartname;
-    attributeClick["chart" + chartnumber].attributename = "fatal_collisions";
-    attributeClick["chart" + chartnumber].textname = "FATAL COLLISIONS";
-    attributeClick["chart" + chartnumber].cf_group = cf_fatal_group;
-    attributeClick["chart" + chartnumber].cf_rangechart = sparkline3;
-    cfsparkline.draw();
-    console.log(attributeClick["chart" + chartnumber]);
-  });
-
-  $( "#clickgroup4" ).click(function() {
-    cfsparkline.init();
-    var chartnumber = indexAttribute++ % MAX_CHARTS;
-    var chartname = "#chart" + chartnumber;
-    var attributename = "#sparkline4";
-    attributeClick["chart" + chartnumber].sparkline = attributename;
-    attributeClick["chart" + chartnumber].chartname = chartname;
-    attributeClick["chart" + chartnumber].attributename = "injures";
-    attributeClick["chart" + chartnumber].textname = "INJURIES";
-    attributeClick["chart" + chartnumber].cf_group = cf_injures_group;
-    attributeClick["chart" + chartnumber].cf_rangechart = sparkline4;
-    cfsparkline.draw();
-    console.log(attributeClick["chart" + chartnumber]);
-  }); 
-
-  $( "#clickgroup5" ).click(function() {
-    cfsparkline.init();
-    var chartnumber = indexAttribute++ % MAX_CHARTS;
-    var chartname = "#chart" + chartnumber;
-    var attributename = "#sparkline5";
-    attributeClick["chart" + chartnumber].sparkline = attributename;
-    attributeClick["chart" + chartnumber].chartname = chartname;
-    attributeClick["chart" + chartnumber].attributename = "fatalities";
-    attributeClick["chart" + chartnumber].textname = "FATALITIES";
-    attributeClick["chart" + chartnumber].cf_group = cf_fatalities_group;
-    attributeClick["chart" + chartnumber].cf_rangechart = sparkline5;
-    cfsparkline.draw();
-    console.log(attributeClick["chart" + chartnumber]);
-  }); 
-
-  $( "#clickgroup6" ).click(function() {
-    cfsparkline.init();
-    var chartnumber = indexAttribute++ % MAX_CHARTS;
-    var chartname = "#chart" + chartnumber;
-    var attributename = "#sparkline6";
-    attributeClick["chart" + chartnumber].sparkline = attributename;
-    attributeClick["chart" + chartnumber].chartname = chartname;
-    attributeClick["chart" + chartnumber].attributename = "cyclists_involved";
-    attributeClick["chart" + chartnumber].textname = "CYCLISTS INVOLVED";
-    attributeClick["chart" + chartnumber].cf_group = cf_cyclists_group;
-    attributeClick["chart" + chartnumber].cf_rangechart = sparkline6;
-    cfsparkline.draw();
-    console.log(attributeClick["chart" + chartnumber]);
-  }); 
-
-  $( "#clickgroup7" ).click(function() {
-    cfsparkline.init();
-    var chartnumber = indexAttribute++ % MAX_CHARTS;
-    var chartname = "#chart" + chartnumber;
-    var attributename = "#sparkline7";
-    attributeClick["chart" + chartnumber].sparkline = attributename;
-    attributeClick["chart" + chartnumber].chartname = chartname;
-    attributeClick["chart" + chartnumber].attributename = "pedestrians_involved";
-    attributeClick["chart" + chartnumber].textname = "PEDESTRIANS INVOLVED";
-    attributeClick["chart" + chartnumber].cf_group = cf_pedestrians_group;
-    attributeClick["chart" + chartnumber].cf_rangechart = sparkline7;
-    cfsparkline.draw();
-    console.log(attributeClick["chart" + chartnumber]);
-  });
+  cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
 }
 
 
 
 
 
-/*  Initialize the precinct selector
- *  @param:  None
- *  @return: None
-*/
-function initPrecinctSelect()
-{
+
+
+
+
+//---------------------------------------------------------------------------------//
+//                                INIT PRECINCT SELECT
+//---------------------------------------------------------------------------------//
+function initPrecinctSelect(){
 
   // Populate the precincts dropdown dynamically
   list_of_precincts.forEach(function(d){$( "<option value=\"" + d + "\">" + "Precinct: " + d + "</option>" ).appendTo( $( "#select_precincts" ) );});
@@ -328,14 +136,11 @@ function initPrecinctSelect()
     // Get the precinct value from the dropdown
     var csvFileNumber = $("#select_precincts").val();
 
-    // Load the Daily Trend Line Dataset
-    // dailytrendline.loadCSV(dailytrendline.csvFileDirectory + dailytrendline.csvFileName + csvFileNumber + dailytrendline.csvFileExtension);
-
     // Load the Spark Line Dataset
-    sparkline.loadCSV(sparkline.csvFileDirectory + sparkline.csvFileName + csvFileNumber + sparkline.csvFileExtension);
+    cfdates.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + csvFileNumber + cfsparkline.csvFileExtension);
 
     // Load the CF Spark Line Dataset
-    cfsparkline.loadCSV(sparkline.csvFileDirectory + sparkline.csvFileName + csvFileNumber + sparkline.csvFileExtension);
+    cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + csvFileNumber + cfsparkline.csvFileExtension);
  
 
     log("Loading Precinct: " + csvFileNumber, "initPrecinctSelect");
@@ -345,76 +150,37 @@ function initPrecinctSelect()
 }
 
 
-/*  Initialize and populate the dropdown dates
- *  @param:  None
- *  @return: None
-*/
-function initDropdownDates()
-{  
-  log("Initializing Dropdown Dates", "initDropdownDates");
-  // Append each of the dates to the dropdown
-  sparkline.dataset.forEach(function(d){$( "<option value=\"" + d.index + "\">" + d.label + "</option>" ).appendTo( $( "#select_dates" ) );});
-  
-  // Set the initial selectedIndex
-  selectedIndex = d3.max(sparkline.dataset, function(d){return d.index;});
-
-  // Set the initial selectedDate
-  selectedDate = d3.max(sparkline.dataset, function(d){return d.date;});
-
-  // Set the current date range to the most recent date
-  $( "#select_dates").val(d3.max(sparkline.dataset, function(d){return d.index;}));
-
-  $("#number1").text(sparkline.dataset[selectedIndex]["all_collisions"]);
-  $("#number2").text(sparkline.dataset[selectedIndex]["injury_collisions"]);
-  $("#number3").text(sparkline.dataset[selectedIndex]["fatal_collisions"]);
-  $("#number4").text(sparkline.dataset[selectedIndex]["injures"]);
-  $("#number5").text(sparkline.dataset[selectedIndex]["fatalities"]);
-  $("#number6").text(sparkline.dataset[selectedIndex]["cyclists_involved"]);
-  $("#number7").text(sparkline.dataset[selectedIndex]["pedestrians_involved"]);
-
-  // On-click
-  $( "#select_dates" ).change(function(){
-    selectedIndex = $("#select_dates").val();
-    
-
-    
-    // Naive number filling
-       
-    $("#number1").text(sparkline.dataset[selectedIndex]["all_collisions"]);
-    $("#number2").text(sparkline.dataset[selectedIndex]["injury_collisions"]);
-    $("#number3").text(sparkline.dataset[selectedIndex]["fatal_collisions"]);
-    $("#number4").text(sparkline.dataset[selectedIndex]["injures"]);
-    $("#number5").text(sparkline.dataset[selectedIndex]["fatalities"]);
-    $("#number6").text(sparkline.dataset[selectedIndex]["cyclists_involved"]);
-    $("#number7").text(sparkline.dataset[selectedIndex]["pedestrians_involved"]);
 
 
 
-     /*sparkline.draw("#sparkline2","injury_collisions");
-    sparkline.draw("#sparkline3","fatal_collisions");
-    sparkline.draw("#sparkline4","injures");
-    sparkline.draw("#sparkline5","fatalities");
-    sparkline.draw("#sparkline6","cyclists_involved");
-    sparkline.draw("#sparkline7","pedestrians_involved");
-    */
-
-    // Extract the first and second date from the label
-    var first_date = sparkline.dataset[selectedIndex].label.slice(0,10);
-    var second_date = sparkline.dataset[selectedIndex].label.slice(19,30);
-
-    
-    // Display the report dates at the top label
-    $( "#date-range" ).val(first_date + " - " + second_date);
-    selectedDate = parseDate(second_date);
 
 
-    // TODO: make this show the actual date being loaded, not the index number
-    // console.log(selectedIndex)
+//---------------------------------------------------------------------------------//
+//                              INIT ATTRIBUTE SELECT
+//---------------------------------------------------------------------------------//
+function initAttributesSelect(){
 
-    // Redraw all sparklines
-    // sparkline.redraw();
-    cfsparkline.loadCSV(sparkline.csvFileDirectory + sparkline.csvFileName + initialPrecinct + sparkline.csvFileExtension);
-    largetrendline.redraw();
+  // TODO: maybe set the color of the sparkline name to red if it is selected
+
+  log("Initializing Attribute Dropdowns", "initAttributeSelect");
+
+  $( "#select_attribute_0" ).change(function(){
+    var selection = $("#select_attribute_0").val();
+    cfsparkline.drawlinechart(lineChart0, attribute[selection].sparkline, attribute[selection].group);
+    dc.renderAll();
+  });
+
+  $( "#select_attribute_1" ).change(function(){
+    var selection = $("#select_attribute_1").val();
+    cfsparkline.drawlinechart(lineChart1, attribute[selection].sparkline, attribute[selection].group);
+    dc.renderAll();
+  });
+
+
+  $( "#select_attribute_2" ).change(function(){
+    var selection = $("#select_attribute_2").val();
+    cfsparkline.drawlinechart(lineChart2, attribute[selection].sparkline, attribute[selection].group);
+    dc.renderAll();
   });
 }
 
@@ -423,31 +189,23 @@ function initDropdownDates()
 
 
 
+
+
 //---------------------------------------------------------------------------------//
-//                                    SPARK LINE
+//                                  CF DATES LOAD CSV
 //---------------------------------------------------------------------------------//
+cfdates.loadCSV = function(filename){
 
-
-
-/*  Load the CSV current file
- *  @param:  string   Filename and direcotry of the current CSV file selected from the dropdown
- *  @return: None
-*/
-sparkline.loadCSV = function(filename)
-{
   log("Loading Sparkline CSV.", "sparkline.loadCSV" + ": " + filename);
-  // Clear the dataset and date array
-  sparkline.dataset = [];
-  sparkline.dateArray = [];
+  
+  cfdates.dataset = [];
 
   
-  // Load daily trendline dataset
-  // Load date slider dataset
   d3.csv(filename,
     function(error, data) {            
         data.forEach(function(d,i)
         {
-          sparkline.dataset.push({
+          cfdates.dataset.push({
             all_collisions: +d.all_collisions,
             injury_collisions: +d.injury_collisions,
             fatal_collisions: +d.fatal_collisions,
@@ -463,93 +221,86 @@ sparkline.loadCSV = function(filename)
             date: parseDate(d.label.slice(19,30)),
           })
 
-        // Add the week ending date to the dateArray
-        sparkline.dateArray.push(parseDate(d.label.slice(19,30)));
     }); //data.forEach
 
-
     // Populate the dropdown with dates
-    initDropdownDates();
-
-    // Initial draw
-    // sparkline.redraw();
-    largetrendline.redraw();
-
-    log("Done Loading.", "sparkline.loadCSV" + ": " + filename);
+    cfdates.initDropdownDates();
    
-  }); //d3.csv
-} //sparkline.loadCSV
-
-
-
-
-
-
-/*  Redraw all of the sparklines
- *  @param:  None
- *  @return: None
-*/
-sparkline.redraw = function()
-{
-  sparkline.draw("#sparkline1","all_collisions");
-  sparkline.draw("#sparkline2","injury_collisions");
-  sparkline.draw("#sparkline3","fatal_collisions");
-  sparkline.draw("#sparkline4","injures");
-  sparkline.draw("#sparkline5","fatalities");
-  sparkline.draw("#sparkline6","cyclists_involved");
-  sparkline.draw("#sparkline7","pedestrians_involved");
+  });
 }
 
 
 
 
-/*  Draw a single sparkline
- *  @param:  string    id of the div
- *  @param:  string    csv attribute of the sparkline to draw
- *  @return: None
-*/
-sparkline.draw = function(id, attribute)
-{
-  var x = d3.scale.linear().range([0, sparkline.width - 2]);
-  var y = d3.scale.linear().range([sparkline.height - 4, 0]);
-  var parseDate = d3.time.format("%Y-%m-%d").parse;
-  var line = d3.svg.line()
-               .interpolate("basis")
-               .x(function(d) { return x(d.date); })
-               .y(function(d) { return y(d[attribute]); });
+
+//---------------------------------------------------------------------------------//
+//                             INIT DROPDOWN DATES
+//---------------------------------------------------------------------------------//
+cfdates.initDropdownDates = function(){  
+
+  log("Initializing Dropdown Dates", "initDropdownDates");
+  
+  // Append each of the dates to the dropdown
+  cfdates.dataset.forEach(function(d){$( "<option value=\"" + d.index + "\">" + d.label + "</option>" ).appendTo( $( "#select_dates" ) );});
+  
+  // Set the initial selected_index
+  selected_index = d3.max(cfdates.dataset, function(d){return d.index;});
+
+  // Set the initial selected_date
+  selected_date = d3.max(cfdates.dataset, function(d){return d.date;});
+
+  earliest_date = cfdates.dataset[0].label.slice(0,10);
+
+  // Set the current date range to the most recent date
+  $( "#select_dates").val(d3.max(cfdates.dataset, function(d){return d.index;}));
+
+  // Set the weekly aggregated numbers of the html paragraphs next to the sparkline
+  $("#number1").text(cfdates.dataset[selected_index]["all_collisions"]);
+  $("#number2").text(cfdates.dataset[selected_index]["injury_collisions"]);
+  $("#number3").text(cfdates.dataset[selected_index]["fatal_collisions"]);
+  $("#number4").text(cfdates.dataset[selected_index]["injures"]);
+  $("#number5").text(cfdates.dataset[selected_index]["fatalities"]);
+  $("#number6").text(cfdates.dataset[selected_index]["cyclists_involved"]);
+  $("#number7").text(cfdates.dataset[selected_index]["pedestrians_involved"]);
+
+  // On-Change
+  $( "#select_dates" ).change(function(){
+    selected_index = $("#select_dates").val();
+    
+    // Naive number filling
+       
+    $("#number1").text(cfdates.dataset[selected_index]["all_collisions"]);
+    $("#number2").text(cfdates.dataset[selected_index]["injury_collisions"]);
+    $("#number3").text(cfdates.dataset[selected_index]["fatal_collisions"]);
+    $("#number4").text(cfdates.dataset[selected_index]["injures"]);
+    $("#number5").text(cfdates.dataset[selected_index]["fatalities"]);
+    $("#number6").text(cfdates.dataset[selected_index]["cyclists_involved"]);
+    $("#number7").text(cfdates.dataset[selected_index]["pedestrians_involved"]);
 
 
-    // x.domain(d3.extent(sparkline.dataset, function(d){return d.date;}));
-    x.domain([d3.min(sparkline.dataset, function(d){return d.date;}), selectedDate]);
-    y.domain(d3.extent(sparkline.dataset, function(d) { return d[attribute]; }));
-
-
-  // Remove the existing svg then draw
-  d3.select(id).select("svg").remove();
-
-  // Redraw the svg
-  var svg = d3.select(id).append("svg")
-       .attr('width', sparkline.width)
-                .attr('height', sparkline.height)
-                .append('g')
-                .attr('transform', 'translate(0, 2)');
-
-    svg.append('path')
-       .datum(sparkline.dataset)
-       .attr('class', 'sparkline')
-       .attr('d', line);
-    svg.append('circle')
-       .attr('class', 'sparkcircle')
-       .attr('cx', x(selectedDate))
-       .attr('cy', y(sparkline.dataset[selectedIndex][attribute]))
-       .attr('r', 1.5);  
+    // Redraw all sparklines
+    cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
+    
+  });
 }
 
 
 
-cfsparkline.loadCSV = function(filename)
-{
 
+
+
+
+
+
+
+
+
+//---------------------------------------------------------------------------------//
+//                          CF SPARKLINE LOAD CSV
+//---------------------------------------------------------------------------------//
+cfsparkline.loadCSV = function(filename){
+  
+  log("Loading CSV.", "cfsparkline.loadCSV" + ": " + filename);
   cfsparkline.dataset = [];
 
   d3.csv(filename, function(error, d){
@@ -562,74 +313,33 @@ cfsparkline.loadCSV = function(filename)
         // 2012,26,1,2012-06-25 through 2012-07-01,7,0,0,0,0,0,0,0
         // 2012,27,1,2012-07-02 through 2012-07-08,61,9,0,11,0,4,5,1
         cfsparkline.dataset.forEach(function(d){
-          d.first_day      = d.label.substr(0,10);
-          d.ts             = formatDate.parse( d.first_day );
-          d.year           = +d.year;
-          d.week           = +d.week;
-          d.index          = +d.index;
-          d.all_collisions = +d.all_collisions;
-          d.injury_collisions = +d.injury_collisions;
-          d.fatal_collisions = +d.fatal_collisions;
-          d.injures      = +d.injures;
-          fatalities      = +d.fatalities;
-          cyclists_involved =  +d.cyclists_involved;
-          pedestrians_involved = +d.pedestrians_involved;
+          d.first_day             = d.label.substr(0,10);
+          d.ts                    = formatDate.parse( d.first_day );
+          d.year                  = +d.year;
+          d.week                  = +d.week;
+          d.index                 = +d.index;
+          d.label                 =  d.label;
+          d.date                  =  parseDate(d.label.slice(19,30)),
+          d.all_collisions        = +d.all_collisions;
+          d.injury_collisions     = +d.injury_collisions;
+          d.fatal_collisions      = +d.fatal_collisions;
+          d.injures               = +d.injures;
+          fatalities              = +d.fatalities;
+          cyclists_involved       = +d.cyclists_involved;
+          pedestrians_involved    = +d.pedestrians_involved;
         });
-        
+
+                
         cfsparkline.init();
-
-        // attributeclick
-        // Initial values
-        attributeClick["chart0"].sparkline = '#sparkline1';
-        attributeClick["chart0"].chartname = '#chart0';
-        attributeClick["chart0"].attributename = "all_collisions";
-        attributeClick["chart0"].cf_group = cf_all_collisions_group;
-        attributeClick["chart0"].cf_rangechart = sparkline1;
-
-        attributeClick["chart1"].sparkline = '#sparkline2';
-        attributeClick["chart1"].chartname = '#chart1';
-        attributeClick["chart1"].attributename = "injury_collisions";
-        attributeClick["chart1"].cf_group = cf_injury_group;
-        attributeClick["chart1"].cf_rangechart = sparkline2;
-
-        attributeClick["chart2"].sparkline = '#sparkline3';
-        attributeClick["chart2"].chartname = '#chart2';
-        attributeClick["chart2"].attributename = "fatal_collisions";
-        attributeClick["chart2"].cf_group = cf_fatal_group;
-        attributeClick["chart2"].cf_rangechart = sparkline2;
-
-        attributeClick["chart3"].sparkline = '#sparkline4';
-        attributeClick["chart3"].chartname = '#chart3';
-        attributeClick["chart3"].attributename = "injures";
-        attributeClick["chart3"].cf_group = cf_injures_group;
-        attributeClick["chart3"].cf_rangechart = sparkline4;
-
-        attributeClick["chart4"].sparkline = '#sparkline5';
-        attributeClick["chart4"].chartname = '#chart4';
-        attributeClick["chart4"].attributename = "fatalities";
-        attributeClick["chart4"].cf_group = cf_fatalities_group;
-        attributeClick["chart4"].cf_rangechart = sparkline2;
-
-        attributeClick["chart5"].sparkline = '#sparkline6';
-        attributeClick["chart5"].chartname = '#chart5';
-        attributeClick["chart5"].attributename = "cyclists_involved";
-        attributeClick["chart5"].cf_group = cf_cyclists_group;
-        attributeClick["chart5"].cf_rangechart = sparkline2;
-
-        attributeClick["chart6"].sparkline = '#sparkline7';
-        attributeClick["chart6"].chartname = '#chart6';
-        attributeClick["chart6"].attributename = "pedestrians_involved";
-        attributeClick["chart6"].cf_group = cf_pedestrians_group;
-        attributeClick["chart6"].cf_rangechart = sparkline2;
-
-        cfsparkline.draw();
     });
 }
 
 
 
 
-
+//---------------------------------------------------------------------------------//
+//                                  CF INIT
+//---------------------------------------------------------------------------------//
 cfsparkline.init = function(){
 
   // cross-filtering
@@ -637,12 +347,12 @@ cfsparkline.init = function(){
   cf_time_dim = cf.dimension( function(d){ return d.ts } );
 
   cf_all_collisions_group = cf_time_dim.group().reduceSum( function(d){ return d.all_collisions;});
-  cf_injury_group = cf_time_dim.group().reduceSum( function(d){ return d.injury_collisions } );
-  cf_fatal_group = cf_time_dim.group().reduceSum( function(d){ return d.fatal_collisions } );
-  cf_injures_group = cf_time_dim.group().reduceSum( function(d){ return d.injures } );
-  cf_fatalities_group = cf_time_dim.group().reduceSum( function(d){ return d.fatalities } );      
-  cf_cyclists_group = cf_time_dim.group().reduceSum( function(d){ return d.cyclists_involved } );
-  cf_pedestrians_group = cf_time_dim.group().reduceSum( function(d){ return d.pedestrians_involved } );
+  cf_injury_group         = cf_time_dim.group().reduceSum( function(d){ return d.injury_collisions } );
+  cf_fatal_group          = cf_time_dim.group().reduceSum( function(d){ return d.fatal_collisions } );
+  cf_injures_group        = cf_time_dim.group().reduceSum( function(d){ return d.injures } );
+  cf_fatalities_group     = cf_time_dim.group().reduceSum( function(d){ return d.fatalities } );      
+  cf_cyclists_group       = cf_time_dim.group().reduceSum( function(d){ return d.cyclists_involved } );
+  cf_pedestrians_group    = cf_time_dim.group().reduceSum( function(d){ return d.pedestrians_involved } );
 
   sparkline1 = dc.lineChart('#sparkline1');
   sparkline2 = dc.lineChart('#sparkline2');
@@ -651,333 +361,80 @@ cfsparkline.init = function(){
   sparkline5 = dc.lineChart('#sparkline5');
   sparkline6 = dc.lineChart('#sparkline6');
   sparkline7 = dc.lineChart('#sparkline7');
+
+  lineChart0 = dc.lineChart('#line-chart0');
+  lineChart1 = dc.lineChart('#line-chart1');
+  lineChart2 = dc.lineChart('#line-chart2');
+
+  most_recent_date = cfsparkline.dataset[selected_index].ts;
+
+  // Set up the attributes dictionary
+  attribute['1'].sparkline = sparkline1; attribute['1'].group = cf_all_collisions_group;
+  attribute['2'].sparkline = sparkline2; attribute['2'].group = cf_injury_group;
+  attribute['3'].sparkline = sparkline3; attribute['3'].group = cf_fatal_group;
+  attribute['4'].sparkline = sparkline4; attribute['4'].group = cf_injures_group;
+  attribute['5'].sparkline = sparkline5; attribute['5'].group = cf_fatalities_group;
+  attribute['6'].sparkline = sparkline6; attribute['6'].group = cf_cyclists_group;
+  attribute['7'].sparkline = sparkline7; attribute['7'].group = cf_pedestrians_group;
+
+
+  // Draw Spark Lines
+  cfsparkline.drawsparkline(sparkline1, cf_all_collisions_group);
+  cfsparkline.drawsparkline(sparkline2, cf_injury_group);
+  cfsparkline.drawsparkline(sparkline3, cf_fatal_group);
+  cfsparkline.drawsparkline(sparkline4, cf_injures_group);
+  cfsparkline.drawsparkline(sparkline5, cf_fatalities_group);
+  cfsparkline.drawsparkline(sparkline6, cf_cyclists_group);
+  cfsparkline.drawsparkline(sparkline7, cf_pedestrians_group);
+
+  // Draw Line Charts
+  cfsparkline.drawlinechart(lineChart0, sparkline1, cf_all_collisions_group);
+  cfsparkline.drawlinechart(lineChart1, sparkline2, cf_injury_group);
+  cfsparkline.drawlinechart(lineChart2, sparkline3, cf_fatal_group);
+
+  // Render all DC objects
+  dc.renderAll();
+>>>>>>> master
 }
-
-cfsparkline.draw = function()
-{
-  log("Drawing CF Sparkilne.", "cfsparkline.draw");
-
-
-      var lineChart0 = dc.lineChart('#line-chart0');
-      var lineChart1 = dc.lineChart('#line-chart1');
-      var lineChart2 = dc.lineChart('#line-chart2');
-      
-      
-      var first_date = cfsparkline.dataset[selectedIndex].ts;
-        
-
-        sparkline1
-        .width(200)
-        .height(30)
-        .x(d3.time.scale().domain([new Date(2012,06,25), first_date]))
-        //cheating
-        .margins({top: 0, right: 5, bottom: -1, left: -1})
-        // Neil, look at this: it should be parameters, if possible
-        .dimension(cf_time_dim)
-        .group(cf_all_collisions_group);
-        
-         sparkline2
-        .width(200)
-        .height(30)
-        .x(d3.time.scale().domain([new Date(2012,06,25), first_date]))
-        //cheating
-        .margins({top: 0, right: 5, bottom: -1, left: -1})
-        .dimension(cf_time_dim)
-        .group(cf_injury_group);
-
-
-         sparkline3
-        .width(200)
-        .height(30)
-        .x(d3.time.scale().domain([new Date(2012,06,25), first_date]))
-        //cheating
-        .margins({top: 0, right: 5, bottom: -1, left: -1})
-        .dimension(cf_time_dim)
-        .group(cf_fatal_group);
-
- 
-        sparkline4 // to preserve order in csv 2 - injury collisions, 3 - fatal collisions
-        .width(200)
-        .height(30)
-        .x(d3.time.scale().domain([new Date(2012,06,25), first_date]))
-        //cheating
-        .margins({top: 0, right: 5, bottom: -1, left: -1})
-        // Neil, look at this:
-        .dimension(cf_time_dim)
-        .group(cf_injures_group);
-        
-        sparkline5
-        .width(200)
-        .height(30)
-        .x(d3.time.scale().domain([new Date(2012,06,25), first_date]))
-        //cheating
-        .margins({top: 0, right: 5, bottom: -1, left: -1})
-        .dimension(cf_time_dim)
-        .group(cf_fatalities_group);
-
-        sparkline6
-        .width(200)
-        .height(30)
-        .x(d3.time.scale().domain([new Date(2012,06,25), first_date]))
-        //cheating
-        .margins({top: 0, right: 5, bottom: -1, left: -1})
-        .dimension(cf_time_dim)
-        .group(cf_cyclists_group);
-
-        sparkline7
-        .width(200)
-        .height(30)
-        .x(d3.time.scale().domain([new Date(2012,06,25), first_date]))
-        //cheating
-        .margins({top: 0, right: 5, bottom: -1, left: -1})
-        .dimension(cf_time_dim)
-        .group(cf_pedestrians_group);
-
-
-
-        lineChart0
-        .renderArea(true)
-        .width(960)
-    	  .height(120)
-    	  .margins({top: 10, right: 10, bottom: 20, left: 23})
-    	  .dimension(cf_time_dim)
-        // Neil, here:
-        .rangeChart(sparkline1)
-        // .group(cf_all_collisions_group)
-        // .rangeChart(dc.lineChart(attributeClick.chart0.attributename))
-        .rangeChart(attributeClick.chart0.cf_rangechart)
-        .group(attributeClick.chart0.cf_group)
-        // *********************************
-        .transitionDuration(500)
-        .brushOn(false)
-        .renderHorizontalGridLines(true)
-        .title(cfsparkline.dataset,function(d){
-           return d.label;})
-             //+ "\nNumber of Incidents: " + d.all_collisions;})
-        .elasticY(true)
-        .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
-        .xUnits(d3.time.week)
-        .xAxis();
-
-        
-        lineChart1
-        .renderArea(true)
-        .width(960)
-        .height(120)
-        .mouseZoomable(true)
-        .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
-        //.x(d3.time.scale().domain([new Date(2012,06,25), new Date(2015,04,13)]))
-        .margins({top: 10, right: 10, bottom: 20, left: 23})
-        .xUnits(d3.time.week)
-        .elasticY(true)
-        .renderHorizontalGridLines(true)
-        .title(cfsparkline.dataset,function(d){
-           return d.label;})
-        .brushOn(false)
-        .dimension(cf_time_dim)
-        // .rangeChart(sparkline4)
-        // .group(cf_injures_group);
-        .rangeChart(attributeClick.chart1.cf_rangechart)
-        .group(attributeClick.chart1.cf_group);
-
-
-         lineChart2
-        .renderArea(true)
-        .width(960)
-// <<<<<<< HEAD
-        .height(150)
-        .margins({top: 10, right: 10, bottom: 20, left: 22})
-
-        // .height(120)
-        // .margins({top: 10, right: 10, bottom: 20, left: 23})
-
-// =======
-        // .height(120)
-        // .margins({top: 10, right: 10, bottom: 20, left: 23})
-// >>>>>>> add8b1de66d228cb3ca1d1cadc92cccdfd6da6ac
-        .dimension(cf_time_dim)
-        // .rangeChart(sparkline5)
-        // .group(cf_fatalities_group)
-        .rangeChart(attributeClick.chart2.cf_rangechart)
-        .group(attributeClick.chart2.cf_group)
-        .transitionDuration(500)
-        .brushOn(false)
-        .renderHorizontalGridLines(true)
-        .title(cfsparkline.dataset,function(d){
-           return d.label;})
-             //+ "\nNumber of Incidents: " + d.all_collisions;})
-        .elasticY(true)
-        .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
-        .xUnits(d3.time.week)
-        .xAxis();
-
-
-
-        dc.renderAll();
-
-        //red-circle stuff
-        //var svg = sparkline1.svg();
-        
-       //  svg.append('circle')
-       //   .attr('class', 'sparkcircle')
-        //  .attr('cx', 395)
-        //  .attr('cy', 76)
-        //  .attr('r', 3);  
-}
-
-
 
 
 
 //---------------------------------------------------------------------------------//
-//                                   DAILY TREND LINE
+//                             CF DRAW SPARK LINE
 //---------------------------------------------------------------------------------//
-
-
-
-/*  Load the CSV current file
- *  @param:  string   Filename and direcotry of the current CSV file selected from the dropdown
- *  @return: None
-*/
-dailytrendline.loadCSV = function(filename)
-{
-  log("Loading Dailytrendline CSV.", "dailytrendline.loadCSV" + ": " + filename);
-  // Clear the dataset and date array
-  dailytrendline.dataset = [];
-  dateslider.dateArray = [];
-
-  
-  // Load daily trendline dataset
-  // Load date slider dataset
-  d3.csv(filename,
-    function(error, data) {            
-        data.forEach(function(d,i)
-        {
-          dailytrendline.dataset.push({
-            precinct: +d.precinct,
-            date: parseDate(d.date),
-            
-            all_collisions: +d.all_collisions,
-            injury_collisions: +d.injury_collisions,
-            fatal_collisions: +d.fatal_collisions,
-            
-          })
-
-          // Add the dates to its own array for the timeline slider
-          dateslider.dateArray.push(d.date);
-    
-    }); //data.forEach
-    
-    dateslider.indexLow = 0;
-    dateslider.indexHigh = dailytrendline.dataset.length-1;
-    dateslider.indexLowNumber = 0;
-    dateslider.indexHighNumber = dailytrendline.dataset.length-1;
-
-    // Initial draw
-    dateslider.redraw();
-    dailytrendline.redraw();
-
-    log("Done Loading.", "dailytrendline.loadCSV" + ": " + filename);
-   
-  }); //d3.csv
-} //dailytrendline.loadCSV
-
-
-
-
-
-
-
-
-/*  Draw the daily trend line
- *  @param:  string    id of the div
- *  @return: None
-*/
-dailytrendline.draw = function(id, attribute)
-{
-  log("Drawing: " + attribute, "dailytrendline.draw");
-
-
-  // Scales and axes. Note the inverted domain for the y-scale: bigger is up!
-  var x = d3.time.scale()
-            .domain([parseDate(tMin), parseDate(tMax)])
-            .range([0, dailytrendline.width+dailytrendline.right+dailytrendline.left]);
-      
-      y = d3.scale.linear()
-            .domain([0, d3.max(dailytrendline.dataset, function(d) { return d[attribute]; })])
-            .range([dailytrendline.height, 0]);
-
-      xAxis = d3.svg.axis().scale(x).tickSize(-dailytrendline.height).tickSubdivide(true).orient("bottom"),
-      yAxis = d3.svg.axis().scale(y).ticks(4).orient("left");
-
-
-  // Create the line 
-  var line = d3.svg.line()
-      .interpolate("linear")
-      .x(function(d) { return x(d.date); })
-      .y(function(d) { return y(d[attribute]); });
-
-
-
-  // An area generator, for the light fill.
-var area = d3.svg.area()
-    .interpolate("monotone")
-    .x(function(d) { return x(d.date); })
-    .y0(dailytrendline.height)
-    .y1(function(d) { return y(d[attribute]); });
-
-  // Set the color of the trend line based on start and end 
-  // var trendcolor = (dailytrendline.dataset[dateslider.indexLow][attribute] >= dailytrendline.dataset[dateslider.indexHigh][attribute]) ? "sparkline area_decreasing" : "sparkline area_increasing";
-  // log(sparkline.dataset[dateslider.indexLow][attribute] + " >= " + sparkline.dataset[dateslider.indexHigh][attribute], "sparkline.draw");  
-
-  // var trendcolor = "large_trend_line area_increasing";
-  var trendcolor = "large_trend_line color_black";
-  
-  // Remove the existing svg then draw
-  d3.select(id).select("svg").remove();
-
-  // Redraw the svg
-  var svg = d3.select(id).append("svg")
-        .attr("width", dailytrendline.width + dailytrendline.left+dailytrendline.left + 1 + dailytrendline.right)
-        .attr("height", dailytrendline.height + (dailytrendline.top*2) + dailytrendline.bottom)
-        .append("g")
-        .attr("transform", "translate(" + dailytrendline.left + "," + dailytrendline.top + ")");
-        
-
-
-  // Draw the trend line
-  svg.append("path")
-      .datum(dailytrendline.dataset)
-      .attr("class", trendcolor)
-      .attr("d", area);
-
-      // Add the x-axis.
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + dailytrendline.height + ")")
-      .call(xAxis);
-
-  // Add the y-axis.
-  svg.append("g")
-      .attr("class", "y axis")
-      .attr("transform", "translate(0,0)")
-      .call(yAxis);
+cfsparkline.drawsparkline = function(cf_sparkline, cf_group){
+  log("Drawing Spark Line", "cfsparkline.drawsparkline");
+  cf_sparkline
+    .width(cfsparkline.width)
+    .height(cfsparkline.height)
+    .x(d3.time.scale().domain([parseDate(earliest_date), most_recent_date]))
+    .margins({top:cfsparkline.top, right:cfsparkline.right, bottom:cfsparkline.bottom, left:cfsparkline.left})
+    .dimension(cf_time_dim)
+    .group(cf_group);
 }
 
 
 
-
-
-
-/*  Redraw all of the daily trend lines
- *  @param:  None
- *  @return: None
-*/
-dailytrendline.redraw = function()
-{
-  dailytrendline.draw("#dailytrend1","all_collisions");
-  dailytrendline.draw("#dailytrend2","injury_collisions");
-  dailytrendline.draw("#dailytrend3","fatal_collisions");
+//---------------------------------------------------------------------------------//
+//                             CF DRAW LINE CHART
+//---------------------------------------------------------------------------------//
+cfsparkline.drawlinechart = function(cf_linechart, cf_rangechart, cf_group){
+  log("Drawing Line Chart", "cfsparkline.drawlinechart");
+  cf_linechart
+    .renderArea(true)
+    .width(960)
+    .height(120)
+    .mouseZoomable(true)
+    .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
+    .margins({top: 10, right: 10, bottom: 20, left: 23})
+    .xUnits(d3.time.week)
+    .elasticY(true)
+    .renderHorizontalGridLines(true)
+    .title(cfsparkline.dataset,function(d){return d.label;}) // TODO: FIX THIS TITLE
+    .brushOn(false)
+    .dimension(cf_time_dim)
+    .rangeChart(cf_rangechart)
+    .group(cf_group);
 }
 
 
@@ -987,348 +444,3 @@ dailytrendline.redraw = function()
 
 
 
-
-//---------------------------------------------------------------------------------//
-//                                   LARGE TREND LINE
-//---------------------------------------------------------------------------------//
-
-
-
-/*  Draw the large trend line
- *  @param:  string    id of the div
- *  @return: None
-*/
-largetrendline.draw = function(id, attribute)
-{
-  log("Drawing: " + attribute, "largetrendline.draw");
-
-  // Scales and axes. Note the inverted domain for the y-scale: bigger is up!
-  var x = d3.time.scale()
-            .domain(d3.extent(sparkline.dataset, function(d) { return d.date;}))
-            .range([0, largetrendline.width+largetrendline.right+largetrendline.left]);
-      
-      y = d3.scale.linear()
-            .domain([0, d3.max(sparkline.dataset, function(d) { return d[attribute]; })])
-            .range([largetrendline.height, 0]);
-
-      xAxis = d3.svg.axis()
-        .scale(x)
-        .tickSize(-largetrendline.height)
-        .tickSubdivide(false)
-        .orient("bottom");
-
-      yAxis = d3.svg.axis()
-        .scale(y)
-        .ticks(3)
-        .orient("left");
-
-
-  // Create the line 
-  var line = d3.svg.line()
-      .interpolate("linear")
-      .x(function(d) { return x(d.date); })
-      .y(function(d) { return y(d[attribute]); });
-
-
-
-  // An area generator, for the light fill.
-var area = d3.svg.area()
-    .interpolate("monotone")
-    .x(function(d) { return x(d.date); })
-    .y0(dailytrendline.height)
-    .y1(function(d) { return y(d[attribute]); });
-
-
-  // var trendcolor = "large_trend_line area_increasing";
-  var trendcolor = "large_trend_line color_black";
-  
-  // Remove the existing svg then draw
-  d3.select(id).select("svg").remove();
-
-  // Redraw the svg
-  var svg = d3.select(id).append("svg")
-        .attr("width", dailytrendline.width + dailytrendline.left+dailytrendline.left + 1 + dailytrendline.right)
-        .attr("height", dailytrendline.height + (dailytrendline.top*2) + dailytrendline.bottom)
-        .append("g")
-        .attr("transform", "translate(" + dailytrendline.left + "," + dailytrendline.top + ")");
-        
-
-
-  // Draw the trend line
-  svg.append("path")
-      .datum(sparkline.dataset)
-      .attr("class", trendcolor)
-      .attr("d", area);
-
-      // Add the x-axis.
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + dailytrendline.height + ")")
-      .call(xAxis);
-
-  // Add the y-axis.
-  svg.append("g")
-      .attr("class", "y axis")
-      .attr("transform", "translate(0,0)")
-      .call(yAxis);
-}
-
-
-
-
-
-
-/*  Redraw all of the daily trend lines
- *  @param:  None
- *  @return: None
-*/
-largetrendline.redraw = function()
-{
-  largetrendline.draw("#dailytrend1","all_collisions");
-  largetrendline.draw("#dailytrend2","injury_collisions");
-  largetrendline.draw("#dailytrend3","fatal_collisions");
-}
-
-
-
-
-
-//---------------------------------------------------------------------------------//
-//                                  DATE SLIDER
-//---------------------------------------------------------------------------------//
-
-
-/*  Draw the date timeline slider
- *  @param:  None
- *  @return: None
-*/
-dateslider.redraw = function()
-{
-  log("Loading Date Slider", "dateslider.redraw");
-  $(function() {
-      $( "#slider-range" ).slider({
-        range: true,
-        min: 0,
-        max: dateslider.dateArray.length-1,
-        values: [ 0, dateslider.dateArray.length ],
-        
-        slide: function( event, ui ) {
-
-          // Lock in the lower value so that it doesn't go less then zero
-          if(dateslider.dateselector > 0){
-            if(ui.values[1]>dateslider.dateselector){
-              // Make the lower value either 7 days, 28 days or 365 days less than the high value
-              ui.values[0] = ui.values[1] - dateslider.dateselector;
-            }
-          }
-
-
-          tMin = dateslider.dateArray[parseInt(ui.values[0])];
-          tMax = dateslider.dateArray[parseInt(ui.values[1])];
-          // log(ui.values[1] + " " + dateslider.dateArray[parseInt(ui.values[1])], dateslider.draw);
-
-          // Index numbers to compare the current trend
-          // Used to adjust the color of green or red
-          dateslider.indexLow = parseInt(ui.values[0]);
-          dateslider.indexHigh = parseInt(ui.values[1]);
-
-          dateslider.indexLowNumber = ui.values[0];
-          dateslider.indexHighNumber = ui.values[1];
-        
-          $( "#date-range" ).val( "  " + tMin + "  -  " + tMax );
-          
-          // Draw after all calculations
-          dailytrendline.redraw();
-          //barchart.redraw();
-        } //END: Slide
-
-      });
-
-      // Run once. Initial values displayed
-      tMin = dateslider.dateArray[parseInt($( "#slider-range" ).slider( "values", 0 ))];
-      tMax = dateslider.dateArray[parseInt($( "#slider-range" ).slider( "values", 1 ))];
-      $( "#date-range" ).val( "  " + tMin + "  -  " + tMax );
-
-      // Initialize the buttons
-      dateslider.initButtons();
-  });
-}// END: dateslider.draw()
-
-
-
-
-
-
-
-
-
-
-
-
-/*  Initialize the time slider buttons
- *  @param:  None
- *  @return: None
-*/
-dateslider.initButtons = function()
-{
-  $( "#btn-range" ).click(function() { 
-    dateslider.dateselector = dateslider.rangerange;
-    $(this).css('color', 'orange');
-    $("#btn-day").css('color', 'black');
-    $("#btn-28day").css('color', 'black');
-    $("#btn-week").css('color', 'black');
-    $("#btn-year").css('color', 'black');
-  });
-
-  $( "#btn-day" ).click(function() { 
-    $( "#slider-range" ).slider( "option", "values", [0,$( "#slider-range" ).slider( "values", 1 )] );
-    dateslider.dateselector = dateslider.rangeday;
-    $(this).css('color', 'orange');
-    $("#btn-range").css('color', 'black');
-    $("#btn-28day").css('color', 'black');
-    $("#btn-week").css('color', 'black');
-    $("#btn-year").css('color', 'black');
-  });
-
-  $( "#btn-week" ).click(function() { 
-    $( "#slider-range" ).slider( "option", "values", [0,$( "#slider-range" ).slider( "values", 1 )] );
-    dateslider.dateselector = dateslider.rangeweek;
-    $(this).css('color', 'orange');
-    $("#btn-day").css('color', 'black');
-    $("#btn-28day").css('color', 'black');
-    $("#btn-year").css('color', 'black');
-    $("#btn-range").css('color', 'black');
-  });
-
-  $( "#btn-28day" ).click(function() { 
-    $( "#slider-range" ).slider( "option", "values", [0,$( "#slider-range" ).slider( "values", 1 )] );
-    dateslider.dateselector = dateslider.range28day;
-    $(this).css('color', 'orange');
-    $("#btn-day").css('color', 'black');
-    $("#btn-week").css('color', 'black');
-    $("#btn-year").css('color', 'black');
-    $("#btn-range").css('color', 'black');
-  });
-
-  $( "#btn-year" ).click(function() { 
-    $( "#slider-range" ).slider( "option", "values", [0,$( "#slider-range" ).slider( "values", 1 )] );
-    dateslider.dateselector = dateslider.rangeyear;
-    $(this).css('color', 'orange');
-    $("#btn-day").css('color', 'black');
-    $("#btn-28day").css('color', 'black');
-    $("#btn-week").css('color', 'black');
-    $("#btn-range").css('color', 'black');
-  });
-}
-
-
-
-
-
-
-//---------------------------------------------------------------------------------//
-//                                     BAR CHART
-//---------------------------------------------------------------------------------//
-
-
-
-/*  Draw the contributing factors barchart
- *  @param:  None
- *  @return: None
-*/
-barchart.redraw = function(){
-  // log("drawBars()", "barchart.redraw");
- 
-
-  // labels without 'Unspecified'
-  var labels = ['Accelerator Defective','Aggressive Driving/Road Rage','Alcohol Involvement','Animals Action','Backing Unsafely','Brakes Defective','Cell Phone (hand-held)','Cell Phone (hands-free)','Driver Inattention/Distraction','Driver Inexperience','Drugs (Illegal)','Failure to Keep Right','Failure to Yield Right-of-Way','Fatigued/Drowsy','Fell Asleep','Following Too Closely','Glare','Headlights Defective','Illness','Lane Marking Improper/Inadequate','Lost Consciousness','Obstruction/Debris','Other Electronic Device','Other Lighting Defects','Other Vehicular','Outside Car Distraction','Oversized Vehicle','Passenger Distraction','Passing or Lane Usage Improper','Pavement Defective','Pavement Slippery','Pedestrian/Bicyclist/Other Pedestrian Error/Confusion','Physical Disability','Prescription Medication','Reaction to Other Uninvolved Vehicle','Shoulders Defective/Improper','Steering Failure','Tire Failure/Inadequate','Tow Hitch Defective','Traffic Control Device Improper/Non-Working','Traffic Control Disregarded','Turning Improperly','Unsafe Lane Changing','Unsafe Speed','View Obstructed/Limited','Windshield Inadequate'];
-  
-  // labels with 'Unspecified'
-  // var data = ['Accelerator Defective','Aggressive Driving/Road Rage','Alcohol Involvement','Animals Action','Backing Unsafely','Brakes Defective','Cell Phone (hand-held)','Cell Phone (hands-free)','Driver Inattention/Distraction','Driver Inexperience','Drugs (Illegal)','Failure to Keep Right','Failure to Yield Right-of-Way','Fatigued/Drowsy','Fell Asleep','Following Too Closely','Glare','Headlights Defective','Illness','Lane Marking Improper/Inadequate','Lost Consciousness','Obstruction/Debris','Other Electronic Device','Other Lighting Defects','Other Vehicular','Outside Car Distraction','Oversized Vehicle','Passenger Distraction','Passing or Lane Usage Improper','Pavement Defective','Pavement Slippery','Pedestrian/Bicyclist/Other Pedestrian Error/Confusion','Physical Disability','Prescription Medication','Reaction to Other Uninvolved Vehicle','Shoulders Defective/Improper','Steering Failure','Tire Failure/Inadequate','Tow Hitch Defective','Traffic Control Device Improper/Non-Working','Traffic Control Disregarded','Turning Improperly','Unsafe Lane Changing','Unsafe Speed','Unspecified','View Obstructed/Limited','Windshield Inadequate']
-
-  // Contributing factors values array
-  values = []
-  
-  // Initialize all values with with zeros for redraw
-  for(var i = 0; i < labels.length; i++){
-    values.push(0);
-  }
-
-  // Add the Contributing Factors
-  for(var i1 = dateslider.indexLowNumber; i1 <= dateslider.indexHighNumber; i1++){
-    for (var i2=0; i2<labels.length; i2++) {
-      values[i2] += sparkline.dataset[i1].contributing_factors[i2].value 
-    }
-  }
-  
-
-  var chartWidth       = 200,
-      barHeight        = 7,
-      groupHeight      = barHeight,
-      gapBetweenGroups = 6,
-      spaceForLabels   = 250;
-
-  // Zip the series data together (first values, second values, etc.)
-  var zippedData = [];
-  for (var i=0; i<labels.length; i++) {
-    zippedData.push(values[i]);
-  }
-
-  var chartHeight = barHeight * zippedData.length + gapBetweenGroups * labels.length;
-
-  var x = d3.scale.linear()
-      .domain([0, d3.max(zippedData)])
-      .range([0, chartWidth-20]);
-
-  var y = d3.scale.linear()
-      .range([chartHeight + gapBetweenGroups, 0]);
-
-  var yAxis = d3.svg.axis()
-      .scale(y)
-      .tickFormat('')
-      .tickSize(0)
-      .orient("left");
-
-
-  // Specify the chart area and dimensions
-  d3.select("#chart").select("svg").remove();
-  var chart = d3.select("#chart").append("svg")
-      .attr("width", spaceForLabels + chartWidth)
-      .attr("height", chartHeight);
-
-  // Create bars
-  var bar = chart.selectAll("g")
-      .data(zippedData)
-      .enter().append("g")
-      .attr("transform", function(d, i) {
-        return "translate(" + spaceForLabels + "," + (i * barHeight + gapBetweenGroups * (0.5 + i)) + ")";
-      });
-
-  // Create rectangles of the correct width
-  bar.append("rect")
-      .attr("fill", "steelblue" )
-      .attr("class", "bar")
-      .attr("width", x)
-      .attr("height", barHeight);
-
-  // Add text label in bar
-  bar.append("text")
-      .attr("x", function(d) { return x(d) + 25; })
-      .attr("y", barHeight / 2)
-      .attr("fill", "red")
-      .attr("dy", ".35em")
-      .text(function(d) { return d; });
-
-  // Draw labels
-  bar.append("text")
-      .attr("class", "label")
-      .attr("x", function(d) { return - 10; })
-      .attr("y", groupHeight / 2)
-      .attr("dy", ".35em")
-      .text(function(d,i) {return labels[i]});
-
-  chart.append("g")
-        .attr("class", "y axis")
-        .attr("transform", "translate(" + spaceForLabels + ", " + -gapBetweenGroups/2 + ")")
-        .call(yAxis);
-}

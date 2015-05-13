@@ -4,27 +4,18 @@
 <meta charset="utf-8">	
 	<title>Charts-for-CompStat</title>
 	<link rel="stylesheet" type="text/css" href="./css/dashboard.css" />
-	<link rel="stylesheet" type="text/css" href="./css/topbar.css" />
 	<link rel="stylesheet" type="text/css" href="./css/global.css" />
-	<link rel="stylesheet" type="text/css" href="./css/slider.css" />
-	<link rel="stylesheet" type="text/css" href="./css/bars.css" />
-        <link rel="stylesheet" type="text/css" href="./css/entry.css" />
+    <link rel="stylesheet" type="text/css" href="./css/entry.css" />
 
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.css">  
+	<link rel="stylesheet" type="text/css" href="./css/sparkline.css">    	
 
-	<link rel="stylesheet" type="text/css" href="./css/sparkline.css">  
   	<script src="//code.jquery.com/jquery-1.10.2.js"></script>
   	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-	
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-	
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.css">  
-
-	
 
 	<meta name="Keywords" content="Charts-for-CompStat" />
 	<meta name="Description" content="" />
-
-
 
 </head>
 
@@ -40,17 +31,17 @@
 
 				<!-- Dates Selector -->
 				<p for="amount">Report Covering the Date Range:</p>
-                                <select id="select_dates"></select>
+                <select id="select_dates"></select>
+				
 				<!-- Precinct Selector -->
 				<select id="select_precincts"></select>
 
 			</div>
 
-
 			<br /><br />
 
 
-			<!-- Sparklines -->
+	<!-- Sparklines -->
 	<div style="width: 100%">
 
 		<div style="width: 50%;float:left;">
@@ -99,6 +90,7 @@
 			</table>
 		</div>
 
+
 		<div style="width: 50%;height:250px;float:right;">
 			<div id="barchart1"><p>Barchart 1</p></div>
 			<div id="barchart2"><p>Barchart 2</p></div>
@@ -115,16 +107,47 @@
 
 		<div><br /><br /><br /></div>
 
+
 		<div>
 		
-		    <p id="text-chart0">ALL COLLISIONS</p>    
-		    <div id="line-chart0"></div>
+			<div>
+			    <select style="margin-top: 10px; margin-bottom: 10px;" id="select_attribute_0">
+			    	<option selected="selected" value="1">ALL COLLISIONS</option>
+					<option value="2">INJURY COLLISIONS</option>
+					<option value="3">FATAL COLLISIONS</option>
+					<option value="4">INJURIES</option>
+					<option value="5">FATALITIES</option>
+					<option value="6">CYCLISTS INVOLVED</option>
+					<option value="7">PEDESTRIANS INVOLVED</option>
+			    </select>
+			    <div id="line-chart0"></div>
+			</div>
 		    
-		    <p id="text-chart1">INJURY COLLISIONS</p>
-		    <div id="line-chart1"></div>
+		    <div>
+			    <select style="margin-top: 10px; margin-bottom: 10px;" id="select_attribute_1">
+			    	<option value="1">ALL COLLISIONS</option>
+					<option selected="selected" value="2">INJURY COLLISIONS</option>
+					<option value="3">FATAL COLLISIONS</option>
+					<option value="4">INJURIES</option>
+					<option value="5">FATALITIES</option>
+					<option value="6">CYCLISTS INVOLVED</option>
+					<option value="7">PEDESTRIANS INVOLVED</option>
+			    </select>
+			    <div id="line-chart1"></div>
+			</div>
 		    
-		    <p id="text-chart2">INJURIES</p>
-		    <div id="line-chart2"></div>
+		    <div>
+			    <select style="margin-top: 10px; margin-bottom: 10px;" id="select_attribute_2">
+			    	<option value="1">ALL COLLISIONS</option>
+					<option value="2">INJURY COLLISIONS</option>
+					<option selected="selected" value="3">FATAL COLLISIONS</option>
+					<option value="4">INJURIES</option>
+					<option value="5">FATALITIES</option>
+					<option value="6">CYCLISTS INVOLVED</option>
+					<option value="7">PEDESTRIANS INVOLVED</option>
+			    </select>
+			    <div id="line-chart2"></div>
+			</div>
 
        </div>
 
