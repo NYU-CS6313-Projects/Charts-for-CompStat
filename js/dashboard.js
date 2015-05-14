@@ -392,6 +392,27 @@ cfsparkline.init = function(){
   cfsparkline.drawlinechart(lineChart1, sparkline2, cf_injury_group);
   cfsparkline.drawlinechart(lineChart2, sparkline3, cf_fatal_group);
 
+  //MOVE TO PROPER PLACE
+  var changes = cf.dimension(function (d) {
+  // TODO: make proper attribute
+        return Math.round((d.all_collisions - d.injures) / d.all_collisions * 100);
+    });
+  var changes_group = changes.group();
+
+  var tempbar = dc.barChart('#barchart1')
+     .width(cfsparkline.width+70)
+     .height(cfsparkline.height+120)
+     .margins({top: 10, right: 50, bottom: 30, left: 40})
+     .dimension(changes)
+     .group(changes_group)
+     .elasticY(true)
+     .x(d3.scale.linear().domain([40,100]))
+     .gap(1)
+     .renderHorizontalGridLines(true)
+  //MOVE TO PROPER PLACES
+
+
+
   // Render all DC objects
   dc.renderAll();
 }
