@@ -52,6 +52,11 @@ var cfsparkline = {
 
 // TODO: populate the attribute dropdown with names.  If you select an attribute then remove it from the choices of the others
 //var attribute_names = ['ALL COLLISIONS','INJURY COLLISIONS','FATAL COLLISIONS','INJURIES','FATALITIES','CYCLISTS INVOLVED','PEDESTRIANS INVOLVED'];
+var max_attributes = 7;
+
+var attribute_selection1 = "1";
+var attribute_selection2 = "2";
+var attribute_selection3 = "3";
 
 var attribute = {"1" : {sparkline : null, group : null},
                  "2" : {sparkline : null, group : null},
@@ -60,12 +65,6 @@ var attribute = {"1" : {sparkline : null, group : null},
                  "5" : {sparkline : null, group : null},
                  "6" : {sparkline : null, group : null},
                  "7" : {sparkline : null, group : null}}
-
-
-
-
-
-
 
 
 
@@ -112,6 +111,10 @@ function initDashboard(){
 
   // Load the CF Spark Line Dataset
   cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
+
+  addBold(attribute_selection1);
+  addBold(attribute_selection2);
+  addBold(attribute_selection3);
 }
 
 
@@ -165,24 +168,47 @@ function initAttributesSelect(){
   log("Initializing Attribute Dropdowns", "initAttributeSelect");
 
   $( "#select_attribute_0" ).change(function(){
-    var selection = $("#select_attribute_0").val();
-    cfsparkline.drawlinechart(lineChart0, attribute[selection].sparkline, attribute[selection].group);
+
+    // Remove the bold
+    removeBold(attribute_selection1);
+
+    attribute_selection1 = $("#select_attribute_0").val();
+    cfsparkline.drawlinechart(lineChart0, attribute[attribute_selection1].sparkline, attribute[attribute_selection1].group);
     dc.renderAll();
+    
+    // Add the bold
+    addBold(attribute_selection1);
   });
 
   $( "#select_attribute_1" ).change(function(){
-    var selection = $("#select_attribute_1").val();
-    cfsparkline.drawlinechart(lineChart1, attribute[selection].sparkline, attribute[selection].group);
+    // Remove the bold
+    removeBold(attribute_selection2);
+
+    attribute_selection2 = $("#select_attribute_1").val();
+    cfsparkline.drawlinechart(lineChart1, attribute[attribute_selection2].sparkline, attribute[attribute_selection2].group);
     dc.renderAll();
+
+    // Add the bold
+    addBold(attribute_selection2);
   });
 
 
   $( "#select_attribute_2" ).change(function(){
-    var selection = $("#select_attribute_2").val();
-    cfsparkline.drawlinechart(lineChart2, attribute[selection].sparkline, attribute[selection].group);
+    // Remove the bold
+    removeBold(attribute_selection3);
+
+    attribute_selection3 = $("#select_attribute_2").val();
+    cfsparkline.drawlinechart(lineChart2, attribute[attribute_selection3].sparkline, attribute[attribute_selection3].group);
     dc.renderAll();
+
+    // Remove the bold
+    addBold(attribute_selection3);
   });
 }
+
+// Add/Remove bold when item is selected
+function removeBold(n){ $("#clickgroup" + n.toString()).removeClass("attribute_selected");}
+function    addBold(n){ $("#clickgroup" + n.toString()).addClass("attribute_selected");}
 
 
 
@@ -196,7 +222,7 @@ function initAttributesSelect(){
 //---------------------------------------------------------------------------------//
 cfdates.loadCSV = function(filename){
 
-  log("Loading Sparkline CSV.", "sparkline.loadCSV" + ": " + filename);
+  log("Loading Dates CSV.", "cfdates.loadCSV" + ": " + filename);
   
   cfdates.dataset = [];
   
@@ -318,14 +344,14 @@ cfsparkline.loadCSV = function(filename){
           d.week                  = +d.week;
           d.index                 = +d.index;
           d.label                 =  d.label;
-          d.date                  =  parseDate(d.label.slice(19,30)),
+          d.date                  =  parseDate(d.label.slice(19,30));
           d.all_collisions        = +d.all_collisions;
           d.injury_collisions     = +d.injury_collisions;
           d.fatal_collisions      = +d.fatal_collisions;
           d.injures               = +d.injures;
-          fatalities              = +d.fatalities;
-          cyclists_involved       = +d.cyclists_involved;
-          pedestrians_involved    = +d.pedestrians_involved;
+          d.fatalities              = +d.fatalities;
+          d.cyclists_involved       = +d.cyclists_involved;
+          d.pedestrians_involved    = +d.pedestrians_involved;
         });
 
                 
@@ -388,9 +414,9 @@ cfsparkline.init = function(){
   cfsparkline.drawsparkline(sparkline7, cf_pedestrians_group);
 
   // Draw Line Charts
-  cfsparkline.drawlinechart(lineChart0, sparkline1, cf_all_collisions_group);
-  cfsparkline.drawlinechart(lineChart1, sparkline2, cf_injury_group);
-  cfsparkline.drawlinechart(lineChart2, sparkline3, cf_fatal_group);
+  cfsparkline.drawlinechart(lineChart0, attribute[attribute_selection1].sparkline, attribute[attribute_selection1].group);
+  cfsparkline.drawlinechart(lineChart1, attribute[attribute_selection2].sparkline, attribute[attribute_selection2].group);
+  cfsparkline.drawlinechart(lineChart2, attribute[attribute_selection3].sparkline, attribute[attribute_selection3].group);
 
   // Render all DC objects
   dc.renderAll();
@@ -402,7 +428,7 @@ cfsparkline.init = function(){
 //                             CF DRAW SPARK LINE
 //---------------------------------------------------------------------------------//
 cfsparkline.drawsparkline = function(cf_sparkline, cf_group){
-  log("Drawing Spark Line", "cfsparkline.drawsparkline");
+  // log("Drawing Spark Line", "cfsparkline.drawsparkline");
   cf_sparkline
     .width(cfsparkline.width)
     .height(cfsparkline.height)
@@ -418,7 +444,7 @@ cfsparkline.drawsparkline = function(cf_sparkline, cf_group){
 //                             CF DRAW LINE CHART
 //---------------------------------------------------------------------------------//
 cfsparkline.drawlinechart = function(cf_linechart, cf_rangechart, cf_group){
-  log("Drawing Line Chart", "cfsparkline.drawlinechart");
+  // log("Drawing Line Chart", "cfsparkline.drawlinechart");
   cf_linechart
     .renderArea(true)
     .width(960)
@@ -428,10 +454,10 @@ cfsparkline.drawlinechart = function(cf_linechart, cf_rangechart, cf_group){
     .margins({top: 10, right: 10, bottom: 20, left: 23})
     .xUnits(d3.time.week)
     .elasticY(true)
-    .renderHorizontalGridLines(true)
-    .title(cfsparkline.dataset,function(d){return d.label;}) // TODO: FIX THIS TITLE
+    .renderHorizontalGridLines(true)    
     .brushOn(false)
     .dimension(cf_time_dim)
+    .title(function(d){return d.value;})
     .rangeChart(cf_rangechart)
     .group(cf_group);
 }
