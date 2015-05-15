@@ -68,6 +68,31 @@ var attribute = {"1" : {sparkline : null, group : null},
 
 
 
+
+
+var barchart = {
+  draw: null,
+  margin: null,
+  top: 20,
+  right: 20,
+  bottom: 30,
+  left: 40,
+  height: null,
+  width: null,
+  tickcount: 4,
+}
+
+barchart.margin = {top: barchart.top, right: barchart.right, bottom: barchart.bottom, left: barchart.left};
+barchart.width = 480 - barchart.margin.left - barchart.margin.right;
+barchart.height = 230 - barchart.margin.top - barchart.margin.bottom;
+
+
+
+
+
+
+
+
 //---------------------------------------------------------------------------------//
 //                          FUNCTION LOG TO CONSOLE
 //---------------------------------------------------------------------------------//
@@ -115,6 +140,10 @@ function initDashboard(){
   addBold(attribute_selection1);
   addBold(attribute_selection2);
   addBold(attribute_selection3);
+
+  barchart.draw("#barchart1");
+  // barchart.draw("#barchart2");
+  // barchart.draw("#barchart3");
 }
 
 
@@ -457,10 +486,124 @@ cfsparkline.drawlinechart = function(cf_linechart, cf_rangechart, cf_group){
     .renderHorizontalGridLines(true)    
     .brushOn(false)
     .dimension(cf_time_dim)
-    .title(function(d){return d.value;})
+    // .title(function(d){return d.value;})
     .rangeChart(cf_rangechart)
     .group(cf_group);
 }
+
+
+
+
+
+
+barchart.draw = function(id){
+
+  log("Drawing Bar Chart.", "barchart.draw");
+
+  //Define tooltip for hover-over info windows
+  var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
+
+
+var formatPercent = d3.format(".0%");
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, barchart.width], .1, .1);
+
+var y = d3.scale.linear()
+    .range([barchart.height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(barchart.tickcount)
+    .tickFormat(formatPercent);
+
+  // Remove the existing svg then draw
+  d3.select(id).select("svg").remove();
+
+  // Redraw the svg
+  var svg = d3.select(id).append("svg")
+    .attr("width", barchart.width + barchart.margin.left + barchart.margin.right)
+    .attr("height", barchart.height + barchart.margin.top + barchart.margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + barchart.margin.left + "," + barchart.margin.top + ")");
+
+
+data = [ {range: 'Week to Date', percent:-0.7},
+            {range: '28 Day', percent:-0.1},
+            {range: '1 Year', percent:0.3},
+            {range: '2 Year', percent:0.2},
+            {range: '3 Year', percent:1.3}];
+
+
+  x.domain(data.map(function(d) { return d.range; }));
+  y.domain([-d3.max(data, function(d) { return d.percent; }), d3.max(data, function(d) { return d.percent; })]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + barchart.height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      // .text("Collisions");
+
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", function(d){return d.percent < 0 ? "bar_negative" : "bar_positive";})
+      .attr({
+          x: function(d){
+            return x(d.range);
+          },
+          y: function(d){
+            return y(Math.max(0, d.percent)); 
+          },
+          width: x.rangeBand(),
+          height: function(d){
+            return Math.abs(y(d.percent) - y(0)); 
+          }
+        })
+      .on('mouseover', function(d){
+              d3.select(this)
+                  .style("opacity", 0.5)
+          
+          var info = div
+                  .style("opacity", 1)
+                  .style("left", (d3.event.pageX-100) + "px")
+                  .style("top", (d3.event.pageY-100) + "px")
+                  .text(d.range);
+
+              info.append("p")
+                  .text(formatPercent(d.percent));
+          
+            })
+                .on('mouseout', function(d){
+                  d3.select(this)
+              .style({'stroke-opacity':0.5})
+              .style("opacity",1);
+
+              div
+                  .style("opacity", 0);
+                });
+
+}
+
+
+
+
 
 
 

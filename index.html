@@ -6,6 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="./css/dashboard.css" />
 	<link rel="stylesheet" type="text/css" href="./css/global.css" />
     <link rel="stylesheet" type="text/css" href="./css/entry.css" />
+    <link rel="stylesheet" type="text/css" href="./css/barchart.css" />
 
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.css">  
@@ -92,13 +93,18 @@
 
 
 		<div style="width: 50%;height:250px;float:right;">
-			<div id="barchart1"><p>Barchart 1</p></div>
-			<div id="barchart2"><p>Barchart 2</p></div>
-			<div id="barchart3"><p>Barchart 3</p></div>
-			<!-- <div id="barchart4"><p>Barchart 4</p></div> -->
-			<!-- <div id="barchart5"><p>Barchart 5</p></div> -->
-			<!-- <div id="barchart6"><p>Barchart 6</p></div> -->
-			<!-- <div id="barchart7"><p>Barchart 7</p></div> -->
+			<div id="barchart1">
+				<select style="margin-top: 10px; margin-bottom: 10px;" id="select_attribute_3">
+			    	<option selected="selected" value="1">ALL COLLISIONS</option>
+					<option value="2">INJURY COLLISIONS</option>
+					<option value="3">FATAL COLLISIONS</option>
+					<option value="4">INJURIES</option>
+					<option value="5">FATALITIES</option>
+					<option value="6">CYCLISTS INVOLVED</option>
+					<option value="7">PEDESTRIANS INVOLVED</option>
+			    </select>
+			</div>
+			
 		</div>
 
 	</div>
