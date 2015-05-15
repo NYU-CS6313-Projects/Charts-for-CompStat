@@ -80,6 +80,7 @@ var barchart = {
   height: null,
   width: null,
   tickcount: 4,
+  calculatePercentages: null,
 }
 
 barchart.margin = {top: barchart.top, right: barchart.right, bottom: barchart.bottom, left: barchart.left};
@@ -88,7 +89,11 @@ barchart.height = 230 - barchart.margin.top - barchart.margin.bottom;
 
 
 
-
+barchart.dataset = [ {range: 'Week to Date', percent:-0.7},
+            {range: '28 Day', percent:-0.1},
+            {range: '1 Year', percent:0.3},
+            {range: '2 Year', percent:0.2},
+            {range: '3 Year', percent:1.3}];
 
 
 
@@ -331,6 +336,9 @@ cfdates.initDropdownDates = function(){
     $("#number6").text(cfdates.dataset[selected_index]["cyclists_involved"]);
     $("#number7").text(cfdates.dataset[selected_index]["pedestrians_involved"]);
 
+    
+    barchart.calculatePercentages();   
+
 
     // Redraw all sparklines
     cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
@@ -486,7 +494,7 @@ cfsparkline.drawlinechart = function(cf_linechart, cf_rangechart, cf_group){
     .renderHorizontalGridLines(true)    
     .brushOn(false)
     .dimension(cf_time_dim)
-    // .title(function(d){return d.value;})
+    .title(function(d){return d.label;})
     .rangeChart(cf_rangechart)
     .group(cf_group);
 }
@@ -535,15 +543,8 @@ var yAxis = d3.svg.axis()
     .attr("transform", "translate(" + barchart.margin.left + "," + barchart.margin.top + ")");
 
 
-data = [ {range: 'Week to Date', percent:-0.7},
-            {range: '28 Day', percent:-0.1},
-            {range: '1 Year', percent:0.3},
-            {range: '2 Year', percent:0.2},
-            {range: '3 Year', percent:1.3}];
-
-
-  x.domain(data.map(function(d) { return d.range; }));
-  y.domain([-d3.max(data, function(d) { return d.percent; }), d3.max(data, function(d) { return d.percent; })]);
+  x.domain(barchart.dataset.map(function(d) { return d.range; }));
+  y.domain([-d3.max(barchart.dataset, function(d) { return d.percent; }), d3.max(barchart.dataset, function(d) { return d.percent; })]);
 
   svg.append("g")
       .attr("class", "x axis")
@@ -561,7 +562,7 @@ data = [ {range: 'Week to Date', percent:-0.7},
       // .text("Collisions");
 
   svg.selectAll(".bar")
-      .data(data)
+      .data(barchart.dataset)
     .enter().append("rect")
       .attr("class", function(d){return d.percent < 0 ? "bar_negative" : "bar_positive";})
       .attr({
@@ -605,6 +606,19 @@ data = [ {range: 'Week to Date', percent:-0.7},
 
 
 
+
+barchart.calculatePercentages = function(){
+
+  // Percentages
+  var p_week, p_28, p_1year, p_2year, p_3year;
+
+
+  console.log(selected_index);
+  console.log(cfsparkline.dataset[selected_index]);
+  ac = cfsparkline.dataset[selected_index]['all_collisions'];
+
+  console.log(ac);
+}
 
 
 
