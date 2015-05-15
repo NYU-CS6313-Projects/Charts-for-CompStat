@@ -474,24 +474,28 @@ cfsparkline.drawsparkline = function(cf_sparkline, cf_group){
 //---------------------------------------------------------------------------------//
 cfsparkline.drawlinechart = function(cf_linechart, cf_rangechart, cf_group){
   // log("Drawing Line Chart", "cfsparkline.drawlinechart");
+  var datelabel = d3.time.format("%a %e %b");
   cf_linechart
-    .renderArea(true)
     .width(960)
     .height(120)
-    .mouseZoomable(true)
-    .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
     .margins({top: 10, right: 10, bottom: 20, left: 23})
-    .xUnits(d3.time.week)
-    .elasticY(true)
-    .renderHorizontalGridLines(true)    
-    .brushOn(false)
     .dimension(cf_time_dim)
-    // .title(function(d){return d.value;})
+    .group(cf_group)
+    .transitionDuration(500)
+    .brushOn(false)
+    .xUnits(d3.time.week)
+    .renderArea(true)
+    .mouseZoomable(true)
+    .renderHorizontalGridLines(true)    
     .rangeChart(cf_rangechart)
-    .group(cf_group);
+    .title(function(d){
+      return datelabel(d.data.key)
+      + "\nNumber of Incidents: " + d.data.value;
+      })
+    .elasticY(true)
+    .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
+    .xAxis();
 }
-
-
 
 
 
