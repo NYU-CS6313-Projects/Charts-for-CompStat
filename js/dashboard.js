@@ -97,6 +97,7 @@ barchart.height = 230 - barchart.margin.top - barchart.margin.bottom;
 //---------------------------------------------------------------------------------//
 //                          FUNCTION LOG TO CONSOLE
 //---------------------------------------------------------------------------------//
+var logging = true;
 function log(m, f){
 
   var message;
@@ -109,7 +110,8 @@ function log(m, f){
   {
     message = "[" + thisFileName + "][" + f + "] " + m;
   }
-  console.log(message);  
+
+  if(logging == true) console.log(message);
 }
 
 
@@ -233,7 +235,7 @@ function initAttributesSelect(){
 
   $( "#select_attribute_3" ).change(function(){
     barchart.attribute = $("#select_attribute_3").val();
-    console.log("selected: " + barchart.attribute);
+    log("Selected Attribute: " + barchart.attribute, "initAttributesSelect");
 
     barchart.draw("#barchart1");
   });
@@ -550,8 +552,6 @@ var yAxis = d3.svg.axis()
   .append("g")
     .attr("transform", "translate(" + barchart.margin.left + "," + barchart.margin.top + ")");
 
-  console.log(d3.max(barchart.dataset, function(d) { return d.percent; }));
-
   x.domain(barchart.dataset.map(function(d) { return d.range; }));
   y.domain([-d3.max(barchart.dataset, function(d) { return Math.abs(d.percent); }), d3.max(barchart.dataset, function(d) { return Math.abs(d.percent); })]);
   // y.domain([-2,2]);
@@ -618,8 +618,6 @@ var yAxis = d3.svg.axis()
 
 
 barchart.calculatePercentages = function(attribute){
-
-  console.log("calculatePercentages: " + attribute);
   
   var past, present;
 
@@ -627,7 +625,8 @@ barchart.calculatePercentages = function(attribute){
   if( (selected_index - 1) >= 0 ){
     past    = parseInt(cfsparkline.dataset[selected_index-1][attribute]);
     present = parseInt(cfsparkline.dataset[selected_index][attribute]);
-    barchart.p_week = (present - past) / past;
+    // Check for divide by 0
+    barchart.p_week = (past == 0 ? 0 : (present - past) / past);
   }
   else{
     barchart.p_week = 0;
@@ -637,7 +636,7 @@ barchart.calculatePercentages = function(attribute){
   if( (selected_index - 4) >= 0 ){
     past    = parseInt(cfsparkline.dataset[selected_index-4][attribute]);
     present = parseInt(cfsparkline.dataset[selected_index][attribute]);
-    barchart.p_28day = (present - past) / past;
+    barchart.p_28day = (past == 0 ? 0 : (present - past) / past);
   }
   else{
     barchart.p_28day = 0;
@@ -647,7 +646,7 @@ barchart.calculatePercentages = function(attribute){
   if( (selected_index - 52) >= 0 ){
     past    = parseInt(cfsparkline.dataset[selected_index-52][attribute]);
     present = parseInt(cfsparkline.dataset[selected_index][attribute]);
-    barchart.p_1year = (present - past) / past;
+    barchart.p_1year = (past == 0 ? 0 : (present - past) / past);
   }
   else{
     barchart.p_1year = 0;
@@ -657,7 +656,7 @@ barchart.calculatePercentages = function(attribute){
   if( (selected_index - 104) >= 0 ){
     past    = parseInt(cfsparkline.dataset[selected_index-104][attribute]);
     present = parseInt(cfsparkline.dataset[selected_index][attribute]);
-    barchart.p_2year = (present - past) / past;
+    barchart.p_2year = (past == 0 ? 0 : (present - past) / past);
   }
   else{
     barchart.p_2year = 0;
@@ -668,7 +667,5 @@ barchart.calculatePercentages = function(attribute){
                         {range: '1 Year',       percent: barchart.p_1year},
                         {range: '2 Years',       percent: barchart.p_2year}];
 
-
-
-  console.log(barchart.p_week, barchart.p_28day, barchart.p_1year, barchart.p_2year);
+  // console.log(barchart.p_week, barchart.p_28day, barchart.p_1year, barchart.p_2year);
 }
