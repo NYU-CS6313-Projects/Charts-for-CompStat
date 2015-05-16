@@ -65,17 +65,15 @@
     font-weight: bold;
 }
 
-.attribute_not_selected { 
+.attribue_not_selected { 
     font-weight: normal;
 }
 
 
 
-
-
-
-
-
+#title { 
+  text-indent: -10px;
+}
 
 
 
