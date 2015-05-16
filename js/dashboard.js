@@ -430,7 +430,8 @@ cfsparkline.init = function(){
   lineChart1 = dc.lineChart('#line-chart1');
   lineChart2 = dc.lineChart('#line-chart2');
 
-  most_recent_date = cfsparkline.dataset[selected_index].ts;
+  // ts2 is the last day of the week ts is the first
+  most_recent_date = cfsparkline.dataset[selected_index].ts2;
 
   // Set up the attributes dictionary
   attribute['1'].sparkline = sparkline1; attribute['1'].group = cf_all_collisions_group;
@@ -474,6 +475,7 @@ cfsparkline.drawsparkline = function(cf_sparkline, cf_group){
     .margins({top:cfsparkline.top, right:cfsparkline.right, bottom:cfsparkline.bottom, left:cfsparkline.left})
     .dimension(cf_time_dim)
     .group(cf_group)
+    
 }
 
 
@@ -554,7 +556,6 @@ var yAxis = d3.svg.axis()
 
   x.domain(barchart.dataset.map(function(d) { return d.range; }));
   y.domain([-d3.max(barchart.dataset, function(d) { return Math.abs(d.percent); }), d3.max(barchart.dataset, function(d) { return Math.abs(d.percent); })]);
-  // y.domain([-2,2]);
 
   svg.append("g")
       .attr("class", "x axis")
