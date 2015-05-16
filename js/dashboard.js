@@ -507,7 +507,8 @@ cfsparkline.drawlinechart = function(cf_linechart, cf_rangechart, cf_group){
       + "\nNumber of Incidents: " + d.data.value;
       })
     .elasticY(true)
-    .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
+    .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts2;})))
+    //.x(d3.time.scale().domain([new Date(2012, 06, 01), new Date(2015, 04, 19)]))
     .xAxis();
 }
 
