@@ -52,6 +52,11 @@ var cfsparkline = {
 
 // TODO: populate the attribute dropdown with names.  If you select an attribute then remove it from the choices of the others
 //var attribute_names = ['ALL COLLISIONS','INJURY COLLISIONS','FATAL COLLISIONS','INJURIES','FATALITIES','CYCLISTS INVOLVED','PEDESTRIANS INVOLVED'];
+var max_attributes = 7;
+
+var attribute_selection1 = "1";
+var attribute_selection2 = "2";
+var attribute_selection3 = "3";
 
 var attribute = {"1" : {sparkline : null, group : null},
                  "2" : {sparkline : null, group : null},
@@ -65,8 +70,28 @@ var attribute = {"1" : {sparkline : null, group : null},
 
 
 
+var barchart = {
+  dataset: null,
+  draw: null,
+  margin: null,
+  top: 20,
+  right: 20,
+  bottom: 30,
+  left: 40,
+  height: null,
+  width: null,
+  tickcount: 4,
+  calculatePercentages: null,
+  p_week: null,
+  p_28day: null,
+  p_1year: null,
+  p_2year: null,
+  attribute: 'all_collisions',
+}
 
-
+barchart.margin = {top: barchart.top, right: barchart.right, bottom: barchart.bottom, left: barchart.left};
+barchart.width = 480 - barchart.margin.left - barchart.margin.right;
+barchart.height = 230 - barchart.margin.top - barchart.margin.bottom;
 
 
 //---------------------------------------------------------------------------------//
@@ -112,6 +137,10 @@ function initDashboard(){
 
   // Load the CF Spark Line Dataset
   cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
+
+  addBold(attribute_selection1);
+  addBold(attribute_selection2);
+  addBold(attribute_selection3);
 }
 
 
@@ -165,24 +194,54 @@ function initAttributesSelect(){
   log("Initializing Attribute Dropdowns", "initAttributeSelect");
 
   $( "#select_attribute_0" ).change(function(){
-    var selection = $("#select_attribute_0").val();
-    cfsparkline.drawlinechart(lineChart0, attribute[selection].sparkline, attribute[selection].group);
+
+    // Remove the bold
+    removeBold(attribute_selection1);
+
+    attribute_selection1 = $("#select_attribute_0").val();
+    cfsparkline.drawlinechart(lineChart0, attribute[attribute_selection1].sparkline, attribute[attribute_selection1].group);
     dc.renderAll();
+    
+    // Add the bold
+    addBold(attribute_selection1);
   });
 
   $( "#select_attribute_1" ).change(function(){
-    var selection = $("#select_attribute_1").val();
-    cfsparkline.drawlinechart(lineChart1, attribute[selection].sparkline, attribute[selection].group);
+    // Remove the bold
+    removeBold(attribute_selection2);
+
+    attribute_selection2 = $("#select_attribute_1").val();
+    cfsparkline.drawlinechart(lineChart1, attribute[attribute_selection2].sparkline, attribute[attribute_selection2].group);
     dc.renderAll();
+
+    // Add the bold
+    addBold(attribute_selection2);
   });
 
 
   $( "#select_attribute_2" ).change(function(){
-    var selection = $("#select_attribute_2").val();
-    cfsparkline.drawlinechart(lineChart2, attribute[selection].sparkline, attribute[selection].group);
+    // Remove the bold
+    removeBold(attribute_selection3);
+
+    attribute_selection3 = $("#select_attribute_2").val();
+    cfsparkline.drawlinechart(lineChart2, attribute[attribute_selection3].sparkline, attribute[attribute_selection3].group);
     dc.renderAll();
+
+    // Remove the bold
+    addBold(attribute_selection3);
+  });
+
+  $( "#select_attribute_3" ).change(function(){
+    barchart.attribute = $("#select_attribute_3").val();
+    console.log("selected: " + barchart.attribute);
+
+    barchart.draw("#barchart1");
   });
 }
+
+// Add/Remove bold when item is selected
+function removeBold(n){ $("#clickgroup" + n.toString()).removeClass("attribute_selected");}
+function    addBold(n){ $("#clickgroup" + n.toString()).addClass("attribute_selected");}
 
 
 
@@ -196,29 +255,28 @@ function initAttributesSelect(){
 //---------------------------------------------------------------------------------//
 cfdates.loadCSV = function(filename){
 
-  log("Loading Sparkline CSV.", "sparkline.loadCSV" + ": " + filename);
+  log("Loading Dates CSV.", "cfdates.loadCSV" + ": " + filename);
   
   cfdates.dataset = [];
-
   
   d3.csv(filename,
     function(error, data) {            
         data.forEach(function(d,i)
         {
           cfdates.dataset.push({
-            all_collisions: +d.all_collisions,
-            injury_collisions: +d.injury_collisions,
-            fatal_collisions: +d.fatal_collisions,
-            injures: +d.injures,
-            fatalities: +d.fatalities,
-            cyclists_involved: +d.cyclists_involved,
+            all_collisions:       +d.all_collisions,
+            injury_collisions:    +d.injury_collisions,
+            fatal_collisions:     +d.fatal_collisions,
+            injures:              +d.injures,
+            fatalities:           +d.fatalities,
+            cyclists_involved:    +d.cyclists_involved,
             pedestrians_involved: +d.pedestrians_involved,
-            year: +d.year,
-            week: +d.week,
-            row_number: +d.row_number,
-            label: d.label,
-            index: +d.index,
-            date: parseDate(d.label.slice(19,30)),
+            year:                 +d.year,
+            week:                 +d.week,
+            row_number:           +d.row_number,
+            label:                d.label,
+            index:                +d.index,
+            date:                 parseDate(d.label.slice(19,30)),
           })
 
     }); //data.forEach
@@ -277,7 +335,6 @@ cfdates.initDropdownDates = function(){
     $("#number6").text(cfdates.dataset[selected_index]["cyclists_involved"]);
     $("#number7").text(cfdates.dataset[selected_index]["pedestrians_involved"]);
 
-
     // Redraw all sparklines
     cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
     
@@ -319,20 +376,23 @@ cfsparkline.loadCSV = function(filename){
           d.week                  = +d.week;
           d.index                 = +d.index;
           d.label                 =  d.label;
-          d.date                  =  parseDate(d.label.slice(19,30)),
+          d.date                  =  parseDate(d.label.slice(19,30));
           d.all_collisions        = +d.all_collisions;
           d.injury_collisions     = +d.injury_collisions;
           d.fatal_collisions      = +d.fatal_collisions;
           d.injures               = +d.injures;
-          fatalities              = +d.fatalities;
-          cyclists_involved       = +d.cyclists_involved;
-          pedestrians_involved    = +d.pedestrians_involved;
+          d.fatalities              = +d.fatalities;
+          d.cyclists_involved       = +d.cyclists_involved;
+          d.pedestrians_involved    = +d.pedestrians_involved;
         });
 
                 
         cfsparkline.init();
+
+        barchart.draw("#barchart1");
     });
 }
+
 
 
 
@@ -388,9 +448,9 @@ cfsparkline.init = function(){
   cfsparkline.drawsparkline(sparkline7, cf_pedestrians_group);
 
   // Draw Line Charts
-  cfsparkline.drawlinechart(lineChart0, sparkline1, cf_all_collisions_group);
-  cfsparkline.drawlinechart(lineChart1, sparkline2, cf_injury_group);
-  cfsparkline.drawlinechart(lineChart2, sparkline3, cf_fatal_group);
+  cfsparkline.drawlinechart(lineChart0, attribute[attribute_selection1].sparkline, attribute[attribute_selection1].group);
+  cfsparkline.drawlinechart(lineChart1, attribute[attribute_selection2].sparkline, attribute[attribute_selection2].group);
+  cfsparkline.drawlinechart(lineChart2, attribute[attribute_selection3].sparkline, attribute[attribute_selection3].group);
 
   // Render all DC objects
   dc.renderAll();
@@ -402,7 +462,7 @@ cfsparkline.init = function(){
 //                             CF DRAW SPARK LINE
 //---------------------------------------------------------------------------------//
 cfsparkline.drawsparkline = function(cf_sparkline, cf_group){
-  log("Drawing Spark Line", "cfsparkline.drawsparkline");
+  // log("Drawing Spark Line", "cfsparkline.drawsparkline");
   cf_sparkline
     .width(cfsparkline.width)
     .height(cfsparkline.height)
@@ -418,22 +478,139 @@ cfsparkline.drawsparkline = function(cf_sparkline, cf_group){
 //                             CF DRAW LINE CHART
 //---------------------------------------------------------------------------------//
 cfsparkline.drawlinechart = function(cf_linechart, cf_rangechart, cf_group){
-  log("Drawing Line Chart", "cfsparkline.drawlinechart");
+  // log("Drawing Line Chart", "cfsparkline.drawlinechart");
+  var datelabel = d3.time.format("%a %e %b");
   cf_linechart
-    .renderArea(true)
     .width(960)
     .height(120)
-    .mouseZoomable(true)
-    .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
     .margins({top: 10, right: 10, bottom: 20, left: 23})
+    .dimension(cf_time_dim)
+    .group(cf_group)
+    .transitionDuration(500)
+    .brushOn(false)
     .xUnits(d3.time.week)
-    .elasticY(true)
-    .renderHorizontalGridLines(true)
-    .title(cfsparkline.dataset,function(d){return d.label;}) // TODO: FIX THIS TITLE
+    .renderArea(true)
+    .mouseZoomable(true)
+    .renderHorizontalGridLines(true)    
+// <<<<<<< HEAD
     .brushOn(false)
     .dimension(cf_time_dim)
+    .title(function(d){return d.label;})
+// =======
+// >>>>>>> a2b38fc9056de373063e0b472b793e924a35ee0a
     .rangeChart(cf_rangechart)
-    .group(cf_group);
+    .title(function(d){
+      return datelabel(d.data.key)
+      + "\nNumber of Incidents: " + d.data.value;
+      })
+    .elasticY(true)
+    .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
+    .xAxis();
+}
+
+
+
+
+barchart.draw = function(id){
+
+  log("Drawing Bar Chart.", "barchart.draw");
+
+  barchart.calculatePercentages(barchart.attribute);
+
+  //Define tooltip for hover-over info windows
+  var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
+
+
+var formatPercent = d3.format(".0%");
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, barchart.width], .1, .1);
+
+var y = d3.scale.linear()
+    .range([barchart.height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(barchart.tickcount)
+    .tickFormat(formatPercent);
+
+  // Remove the existing svg then draw
+  d3.select(id).select("svg").remove();
+
+  // Redraw the svg
+  var svg = d3.select(id).append("svg")
+    .attr("width", barchart.width + barchart.margin.left + barchart.margin.right)
+    .attr("height", barchart.height + barchart.margin.top + barchart.margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + barchart.margin.left + "," + barchart.margin.top + ")");
+
+  console.log(d3.max(barchart.dataset, function(d) { return d.percent; }));
+
+  x.domain(barchart.dataset.map(function(d) { return d.range; }));
+  y.domain([-d3.max(barchart.dataset, function(d) { return Math.abs(d.percent); }), d3.max(barchart.dataset, function(d) { return Math.abs(d.percent); })]);
+  // y.domain([-2,2]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + barchart.height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      // .text("Collisions");
+
+  svg.selectAll(".bar")
+      .data(barchart.dataset)
+    .enter().append("rect")
+      .attr("class", function(d){return d.percent < 0 ? "bar_negative" : "bar_positive";})
+      .attr({
+          x: function(d){
+            return x(d.range);
+          },
+          y: function(d){
+            return y(Math.max(0, d.percent)); 
+          },
+          width: x.rangeBand(),
+          height: function(d){
+            return Math.abs(y(d.percent) - y(0)); 
+          }
+        })
+      .on('mouseover', function(d){
+              d3.select(this)
+                  .style("opacity", 0.5)
+          
+          var info = div
+                  .style("opacity", 1)
+                  .style("left", (d3.event.pageX-100) + "px")
+                  .style("top", (d3.event.pageY-100) + "px")
+                  .text(d.range);
+
+              info.append("p")
+                  .text(formatPercent(d.percent));
+          
+            })
+                .on('mouseout', function(d){
+                  d3.select(this)
+              .style({'stroke-opacity':0.5})
+              .style("opacity",1);
+
+              div
+                  .style("opacity", 0);
+                });
+
 }
 
 
@@ -441,5 +618,58 @@ cfsparkline.drawlinechart = function(cf_linechart, cf_rangechart, cf_group){
 
 
 
+barchart.calculatePercentages = function(attribute){
+
+  console.log("calculatePercentages: " + attribute);
+  
+  var past, present;
+
+  // Check to see if the time range goes back 1 week
+  if( (selected_index - 1) >= 0 ){
+    past    = parseInt(cfsparkline.dataset[selected_index-1][attribute]);
+    present = parseInt(cfsparkline.dataset[selected_index][attribute]);
+    barchart.p_week = (present - past) / present;
+  }
+  else{
+    barchart.p_week = 0;
+  }
+
+  // Check to see if the time range goes back 1 week
+  if( (selected_index - 4) >= 0 ){
+    past    = parseInt(cfsparkline.dataset[selected_index-4][attribute]);
+    present = parseInt(cfsparkline.dataset[selected_index][attribute]);
+    barchart.p_28day = (present - past) / present;
+  }
+  else{
+    barchart.p_28day = 0;
+  }
+
+  // Check to see if the time range goes back 1 week
+  if( (selected_index - 52) >= 0 ){
+    past    = parseInt(cfsparkline.dataset[selected_index-52][attribute]);
+    present = parseInt(cfsparkline.dataset[selected_index][attribute]);
+    barchart.p_1year = (present - past) / present;
+  }
+  else{
+    barchart.p_1year = 0;
+  }
+
+  // Check to see if the time range goes back 1 week
+  if( (selected_index - 104) >= 0 ){
+    past    = parseInt(cfsparkline.dataset[selected_index-104][attribute]);
+    present = parseInt(cfsparkline.dataset[selected_index][attribute]);
+    barchart.p_2year = (present - past) / present;
+  }
+  else{
+    barchart.p_2year = 0;
+  }
+
+  barchart.dataset = [  {range: 'Week to Date', percent: barchart.p_week},
+                        {range: '28 Day',       percent: barchart.p_28day},
+                        {range: '1 Year',       percent: barchart.p_1year},
+                        {range: '2 Year',       percent: barchart.p_2year}];
 
 
+
+  console.log(barchart.p_week, barchart.p_28day, barchart.p_1year, barchart.p_2year);
+}

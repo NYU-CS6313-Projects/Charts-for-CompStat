@@ -55,3 +55,38 @@
 .selectedblue{
 	color:blue;
 }
+
+
+
+
+
+
+.attribute_selected { 
+    font-weight: bold;
+}
+
+.attribue_not_selected { 
+    font-weight: normal;
+}
+
+
+
+#title { 
+  text-indent: -10px;
+}
+
+
+
+
+
+.numbers  {
+  color: #c00;
+}
+
+.name{
+	right: auto;
+}
+
+table.products td.price {
+  text-align: left;
+}

@@ -6,6 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="./css/dashboard.css" />
 	<link rel="stylesheet" type="text/css" href="./css/global.css" />
     <link rel="stylesheet" type="text/css" href="./css/entry.css" />
+    <link rel="stylesheet" type="text/css" href="./css/barchart.css" />
 
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.css">  
@@ -30,7 +31,7 @@
 			<div id="dropdown-selectors">
 
 				<!-- Dates Selector -->
-				<p for="amount">Report Covering the Date Range:</p>
+				<p id = "title" for="amount">REPORT COVERING:</p>
                 <select id="select_dates"></select>
 				
 				<!-- Precinct Selector -->
@@ -67,38 +68,43 @@
 				<tr>
 					<td><span id="sparkline4" class="sparkline"><td></span>
 					<td><p id="clickgroup4" class="name">INJURIES<td></p>
-					<td><p id="number4" class="numbers" align="center"><td></p>
+					<td><p id="number4" class="numbers"><td></p>
 				</tr>
 
 				<tr>
 					<td><span id="sparkline5" class="sparkline"><td></span>
 					<td><p id="clickgroup5" class="name">FATALITIES<td></p>
-					<td><p id="number5" class="numbers" align="center"><td></p>
+					<td><p id="number5" class="numbers"><td></p>
 				</tr>
 
 				<tr>
 					<td><span id="sparkline6" class="sparkline"><td></span>
 					<td><p id="clickgroup6" class="name">CYCLIST INVOLVED<td></p>
-					<td><p id="number6" class="numbers" align="center"><td></p>
+					<td><p id="number6" class="numbers"><td></p>
 				</tr>
 
 				<tr>
 					<td><span id="sparkline7" class="sparkline"><td></span>
 					<td><p id="clickgroup7" class="name">PEDESTRIANS INVOLVED<td></p>
-					<td><p id="number7" class="numbers" align="center"><td></p>
+					<td><p id="number7" class="numbers"><td></p>
 				</tr>
 			</table>
 		</div>
 
 
 		<div style="width: 50%;height:250px;float:right;">
-			<div id="barchart1"><p>Barchart 1</p></div>
-			<div id="barchart2"><p>Barchart 2</p></div>
-			<div id="barchart3"><p>Barchart 3</p></div>
-			<!-- <div id="barchart4"><p>Barchart 4</p></div> -->
-			<!-- <div id="barchart5"><p>Barchart 5</p></div> -->
-			<!-- <div id="barchart6"><p>Barchart 6</p></div> -->
-			<!-- <div id="barchart7"><p>Barchart 7</p></div> -->
+			<div id="barchart1">
+				<select style="margin-top: 10px; margin-bottom: 10px;" id="select_attribute_3">
+			    	<option selected="selected" value="all_collisions">ALL COLLISIONS</option>
+					<option value="injury_collisions">INJURY COLLISIONS</option>
+					<option value="fatal_collisions">FATAL COLLISIONS</option>
+					<option value="injures">INJURIES</option>
+					<option value="fatalities">FATALITIES</option>
+					<option value="cyclist_involved">CYCLISTS INVOLVED</option>
+					<option value="pedestrians_involved">PEDESTRIANS INVOLVED</option>
+			    </select>
+			</div>
+			
 		</div>
 
 	</div>
