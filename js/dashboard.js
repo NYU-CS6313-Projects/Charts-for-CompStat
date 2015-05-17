@@ -637,80 +637,84 @@ barchart.calculatePercentages = function(attribute){
   
   var past, present;
 
+  // Clear the dataset
+  barchart.dataset = [];
+
+  // Initialize dataset
+  barchart.dataset = [  { range: null, percent: null,past_date: null,past: null, present: null},
+                        { range: null, percent: null,past_date: null,past: null, present: null},
+                        { range: null, percent: null,past_date: null,past: null, present: null},
+                        { range: null, percent: null,past_date: null,past: null, present: null}];
+
+
+
   // Check to see if the time range goes back 1 week
   if( (selected_index - 1) >= 0 ){
+  
     past    = parseInt(cfsparkline.dataset[selected_index-1][attribute]);
     present = parseInt(cfsparkline.dataset[selected_index][attribute]);
-    // Check for divide by 0
-    barchart.p_week = (past == 0 ? 0 : (present - past) / past);
+
+    barchart.dataset[0].range = 'Week';
+    barchart.dataset[0].percent = (past == 0 ? 0 : (present - past) / past);
+    barchart.dataset[0].past_date = cfsparkline.dataset[selected_index-1].ts2;
+    barchart.dataset[0].past = cfsparkline.dataset[selected_index-1][attribute];
+    barchart.dataset[0].present = cfsparkline.dataset[selected_index][attribute];
   }
   else{
-    barchart.p_week = 0;
+    barchart.dataset[0].percent = 0;
   }
 
   // Check to see if the time range goes back 28 days
   if( (selected_index - 4) >= 0 ){
     past    = parseInt(cfsparkline.dataset[selected_index-4][attribute]);
     present = parseInt(cfsparkline.dataset[selected_index][attribute]);
-    barchart.p_28day = (past == 0 ? 0 : (present - past) / past);
+    
+    barchart.dataset[1].range = '28 Days';
+    barchart.dataset[1].percent = (past == 0 ? 0 : (present - past) / past);
+    barchart.dataset[1].past_date = cfsparkline.dataset[selected_index-4].ts2;
+    barchart.dataset[1].past = cfsparkline.dataset[selected_index-4][attribute];
+    barchart.dataset[1].present = cfsparkline.dataset[selected_index][attribute];
   }
   else{
-    barchart.p_28day = 0;
+    barchart.dataset[1].percent = 0;
   }
 
   // Check to see if the time range goes back 1 year
   if( (selected_index - 52) >= 0 ){
     past    = parseInt(cfsparkline.dataset[selected_index-52][attribute]);
     present = parseInt(cfsparkline.dataset[selected_index][attribute]);
-    barchart.p_1year = (past == 0 ? 0 : (present - past) / past);
+    
+
+    barchart.dataset[2].range = '1 Year';
+    barchart.dataset[2].percent = (past == 0 ? 0 : (present - past) / past);
+    barchart.dataset[2].past_date = cfsparkline.dataset[selected_index-52].ts2;
+    barchart.dataset[2].past = cfsparkline.dataset[selected_index-52][attribute];
+    barchart.dataset[2].present = cfsparkline.dataset[selected_index][attribute];
   }
   else{
-    barchart.p_1year = 0;
+    barchart.dataset[2].percent = 0;
   }
 
   // Check to see if the time range goes back 2 years
   if( (selected_index - 104) >= 0 ){
     past    = parseInt(cfsparkline.dataset[selected_index-104][attribute]);
     present = parseInt(cfsparkline.dataset[selected_index][attribute]);
-    barchart.p_2year = (past == 0 ? 0 : (present - past) / past);
+    
+
+    barchart.dataset[3].range = '2 Year';
+    barchart.dataset[3].percent = (past == 0 ? 0 : (present - past) / past);
+    barchart.dataset[3].past_date = cfsparkline.dataset[selected_index-104].ts2;
+    barchart.dataset[3].past = cfsparkline.dataset[selected_index-104][attribute];
+    barchart.dataset[3].present = cfsparkline.dataset[selected_index][attribute];
   }
   else{
-    barchart.p_2year = 0;
+    barchart.dataset[3].percent = 0;
   }
 
   // TODO: add the additional tool tip info into this dataset
   // TODO: add the numbers for both dates
   // TODO: fix this redundant code
   // TODO: Change the date format
-  barchart.dataset = [  { range: 'Week',
-                          percent: barchart.p_week,
-                          past_date: cfsparkline.dataset[selected_index-1].ts2,
-                          past: cfsparkline.dataset[selected_index-1][attribute],
-                          present: cfsparkline.dataset[selected_index][attribute],
-                        },
-                        
-                        { range: '28 Days',
-                          percent: barchart.p_28day,    
-                          past_date: cfsparkline.dataset[selected_index-4].ts2,
-                          past: cfsparkline.dataset[selected_index-4][attribute],
-                          present: cfsparkline.dataset[selected_index][attribute],
-                        },
-                        
-                        { range: '1 Year',       
-                          percent: barchart.p_1year,    
-                          past_date: cfsparkline.dataset[selected_index-52].ts2,
-                          past: cfsparkline.dataset[selected_index-52][attribute],
-                          present: cfsparkline.dataset[selected_index][attribute],
-                        },
-                        
-                        {range: '2 Years',      
-                          percent: barchart.p_2year,    
-                          past_date: cfsparkline.dataset[selected_index-104].ts2,
-                          past: cfsparkline.dataset[selected_index-104][attribute],
-                          present: cfsparkline.dataset[selected_index][attribute],
-                        }];
-
-  // console.log(barchart.p_week, barchart.p_28day, barchart.p_1year, barchart.p_2year);
 }
 
 
