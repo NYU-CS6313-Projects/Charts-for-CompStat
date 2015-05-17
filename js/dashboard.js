@@ -132,12 +132,17 @@ function initDashboard(){
   // Initialize attribute change dropdown
   initAttributesSelect();
 
+  // Initialize listener on change for dates
+  cfdates.initDropdownListener();
+
   // Load the dates for the dropdown menu
   // Note: this was the oroginal load csv function for sparklines but after changes it was still necessary to keep
   // the code functioning properly.  Load times are not an issue
+  console.log("******************Calling from init dashboard");
   cfdates.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
 
   // Load the CF Spark Line Dataset
+  console.log("------------------Calling from init dashboard");
   cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
 
   addBold(attribute_selection1);
@@ -171,6 +176,7 @@ function initPrecinctSelect(){
     cfdates.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + csvFileNumber + cfsparkline.csvFileExtension);
 
     // Load the CF Spark Line Dataset
+    console.log("-----calling from init precinct select");
     cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + csvFileNumber + cfsparkline.csvFileExtension);
  
 
@@ -284,6 +290,7 @@ cfdates.loadCSV = function(filename){
     }); //data.forEach
 
     // Populate the dropdown with dates
+    console.log("*********** calling from cf dates loadcsv");
     cfdates.initDropdownDates();
    
   });
@@ -298,9 +305,11 @@ cfdates.loadCSV = function(filename){
 //---------------------------------------------------------------------------------//
 cfdates.initDropdownDates = function(){  
 
+
   log("Initializing Dropdown Dates", "initDropdownDates");
   
   // Append each of the dates to the dropdown
+  $( "#select_dates" ).empty();
   cfdates.dataset.forEach(function(d){$( "<option value=\"" + d.index + "\">" + d.label + "</option>" ).appendTo( $( "#select_dates" ) );});
   
   // Set the initial selected_index
@@ -322,6 +331,24 @@ cfdates.initDropdownDates = function(){
   $("#number5").text(cfdates.dataset[selected_index]["fatalities"]);
   $("#number6").text(cfdates.dataset[selected_index]["cyclists_involved"]);
   $("#number7").text(cfdates.dataset[selected_index]["pedestrians_involved"]);
+}
+
+
+
+
+
+
+
+
+
+//---------------------------------------------------------------------------------//
+//                             INIT DROPDOWN DATES
+//---------------------------------------------------------------------------------//
+cfdates.initDropdownListener = function(){  
+
+
+  log("Initializing on change for dropdowns", "initDropdownListener");
+
 
   // On-Change
   $( "#select_dates" ).change(function(){
@@ -338,13 +365,11 @@ cfdates.initDropdownDates = function(){
     $("#number7").text(cfdates.dataset[selected_index]["pedestrians_involved"]);
 
     // Redraw all sparklines
+    console.log("-----------Calling from cfdates init dropdown");
     cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
     
   });
 }
-
-
-
 
 
 
