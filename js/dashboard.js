@@ -138,11 +138,11 @@ function initDashboard(){
   // Load the dates for the dropdown menu
   // Note: this was the oroginal load csv function for sparklines but after changes it was still necessary to keep
   // the code functioning properly.  Load times are not an issue
-  console.log("******************Calling from init dashboard");
+  
   cfdates.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
 
   // Load the CF Spark Line Dataset
-  console.log("------------------Calling from init dashboard");
+  
   cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
 
   addBold(attribute_selection1);
@@ -176,7 +176,6 @@ function initPrecinctSelect(){
     cfdates.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + csvFileNumber + cfsparkline.csvFileExtension);
 
     // Load the CF Spark Line Dataset
-    console.log("-----calling from init precinct select");
     cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + csvFileNumber + cfsparkline.csvFileExtension);
  
 
@@ -290,7 +289,6 @@ cfdates.loadCSV = function(filename){
     }); //data.forEach
 
     // Populate the dropdown with dates
-    console.log("*********** calling from cf dates loadcsv");
     cfdates.initDropdownDates();
    
   });
@@ -365,7 +363,6 @@ cfdates.initDropdownListener = function(){
     $("#number7").text(cfdates.dataset[selected_index]["pedestrians_involved"]);
 
     // Redraw all sparklines
-    console.log("-----------Calling from cfdates init dropdown");
     cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
     
   });
