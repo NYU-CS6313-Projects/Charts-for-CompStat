@@ -58,13 +58,13 @@ var attribute_selection1 = "1";
 var attribute_selection2 = "2";
 var attribute_selection3 = "3";
 
-var attribute = {"1" : {sparkline : null, group : null},
-                 "2" : {sparkline : null, group : null},
-                 "3" : {sparkline : null, group : null},
-                 "4" : {sparkline : null, group : null},
-                 "5" : {sparkline : null, group : null},
-                 "6" : {sparkline : null, group : null},
-                 "7" : {sparkline : null, group : null}}
+var attribute = {"1" : {sparkline : null, group : null, name: 'All Collisions'},
+                 "2" : {sparkline : null, group : null, name: 'Injury Collisions'},
+                 "3" : {sparkline : null, group : null, name: 'Fatal Collisions'},
+                 "4" : {sparkline : null, group : null, name: 'Injuries'},
+                 "5" : {sparkline : null, group : null, name: 'Fatalities'},
+                 "6" : {sparkline : null, group : null, name: 'Cyclists Involved'},
+                 "7" : {sparkline : null, group : null, name: 'Pedestrians Involved'}}
 
 
 
@@ -132,12 +132,17 @@ function initDashboard(){
   // Initialize attribute change dropdown
   initAttributesSelect();
 
+  // Initialize listener on change for dates
+  cfdates.initDropdownListener();
+
   // Load the dates for the dropdown menu
   // Note: this was the oroginal load csv function for sparklines but after changes it was still necessary to keep
   // the code functioning properly.  Load times are not an issue
+  console.log("******************Calling from init dashboard");
   cfdates.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
 
   // Load the CF Spark Line Dataset
+  console.log("------------------Calling from init dashboard");
   cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
 
   addBold(attribute_selection1);
@@ -171,6 +176,7 @@ function initPrecinctSelect(){
     cfdates.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + csvFileNumber + cfsparkline.csvFileExtension);
 
     // Load the CF Spark Line Dataset
+    console.log("-----calling from init precinct select");
     cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + csvFileNumber + cfsparkline.csvFileExtension);
  
 
@@ -201,7 +207,7 @@ function initAttributesSelect(){
     removeBold(attribute_selection1);
 
     attribute_selection1 = $("#select_attribute_0").val();
-    cfsparkline.drawlinechart(lineChart0, attribute[attribute_selection1].sparkline, attribute[attribute_selection1].group);
+    cfsparkline.drawlinechart(lineChart0, attribute[attribute_selection1].sparkline, attribute[attribute_selection1].group, attribute[attribute_selection1].name);
     dc.renderAll();
     
     // Add the bold
@@ -213,7 +219,7 @@ function initAttributesSelect(){
     removeBold(attribute_selection2);
 
     attribute_selection2 = $("#select_attribute_1").val();
-    cfsparkline.drawlinechart(lineChart1, attribute[attribute_selection2].sparkline, attribute[attribute_selection2].group);
+    cfsparkline.drawlinechart(lineChart1, attribute[attribute_selection2].sparkline, attribute[attribute_selection2].group, attribute[attribute_selection2].name);
     dc.renderAll();
 
     // Add the bold
@@ -226,7 +232,7 @@ function initAttributesSelect(){
     removeBold(attribute_selection3);
 
     attribute_selection3 = $("#select_attribute_2").val();
-    cfsparkline.drawlinechart(lineChart2, attribute[attribute_selection3].sparkline, attribute[attribute_selection3].group);
+    cfsparkline.drawlinechart(lineChart2, attribute[attribute_selection3].sparkline, attribute[attribute_selection3].group, attribute[attribute_selection3].name);
     dc.renderAll();
 
     // Remove the bold
@@ -267,10 +273,10 @@ cfdates.loadCSV = function(filename){
         {
           cfdates.dataset.push({
             all_collisions:       +d.all_collisions,
-            injury_collisions:    +d.injury_collisions,
-            fatal_collisions:     +d.fatal_collisions,
-            injures:              +d.injures,
-            fatalities:           +d.fatalities,
+            injury_collisions:    +d.injures,
+            fatal_collisions:     +d.fatalities,
+            injures:              +d.injury_collisions, // wrong field name
+            fatalities:           +d.fatal_collisions,  // wrong field name
             cyclists_involved:    +d.cyclists_involved,
             pedestrians_involved: +d.pedestrians_involved,
             year:                 +d.year,
@@ -284,6 +290,7 @@ cfdates.loadCSV = function(filename){
     }); //data.forEach
 
     // Populate the dropdown with dates
+    console.log("*********** calling from cf dates loadcsv");
     cfdates.initDropdownDates();
    
   });
@@ -298,9 +305,11 @@ cfdates.loadCSV = function(filename){
 //---------------------------------------------------------------------------------//
 cfdates.initDropdownDates = function(){  
 
+
   log("Initializing Dropdown Dates", "initDropdownDates");
   
   // Append each of the dates to the dropdown
+  $( "#select_dates" ).empty();
   cfdates.dataset.forEach(function(d){$( "<option value=\"" + d.index + "\">" + d.label + "</option>" ).appendTo( $( "#select_dates" ) );});
   
   // Set the initial selected_index
@@ -322,6 +331,24 @@ cfdates.initDropdownDates = function(){
   $("#number5").text(cfdates.dataset[selected_index]["fatalities"]);
   $("#number6").text(cfdates.dataset[selected_index]["cyclists_involved"]);
   $("#number7").text(cfdates.dataset[selected_index]["pedestrians_involved"]);
+}
+
+
+
+
+
+
+
+
+
+//---------------------------------------------------------------------------------//
+//                             INIT DROPDOWN DATES
+//---------------------------------------------------------------------------------//
+cfdates.initDropdownListener = function(){  
+
+
+  log("Initializing on change for dropdowns", "initDropdownListener");
+
 
   // On-Change
   $( "#select_dates" ).change(function(){
@@ -338,13 +365,11 @@ cfdates.initDropdownDates = function(){
     $("#number7").text(cfdates.dataset[selected_index]["pedestrians_involved"]);
 
     // Redraw all sparklines
+    console.log("-----------Calling from cfdates init dropdown");
     cfsparkline.loadCSV(cfsparkline.csvFileDirectory + cfsparkline.csvFileName + cfsparkline.initialPrecinct + cfsparkline.csvFileExtension);
     
   });
 }
-
-
-
 
 
 
@@ -400,6 +425,11 @@ cfsparkline.loadCSV = function(filename){
 
 
 
+// last day of a week, d.last_day
+// day of a week, 
+// year, d.year
+// attribute, d
+
 
 //---------------------------------------------------------------------------------//
 //                                  CF INIT
@@ -453,9 +483,9 @@ cfsparkline.init = function(){
   cfsparkline.drawsparkline(sparkline7, cf_pedestrians_group);
 
   // Draw Line Charts
-  cfsparkline.drawlinechart(lineChart0, attribute[attribute_selection1].sparkline, attribute[attribute_selection1].group);
-  cfsparkline.drawlinechart(lineChart1, attribute[attribute_selection2].sparkline, attribute[attribute_selection2].group);
-  cfsparkline.drawlinechart(lineChart2, attribute[attribute_selection3].sparkline, attribute[attribute_selection3].group);
+  cfsparkline.drawlinechart(lineChart0, attribute[attribute_selection1].sparkline, attribute[attribute_selection1].group, "All Collisions");
+  cfsparkline.drawlinechart(lineChart1, attribute[attribute_selection2].sparkline, attribute[attribute_selection2].group, "Injury Collisions");
+  cfsparkline.drawlinechart(lineChart2, attribute[attribute_selection3].sparkline, attribute[attribute_selection3].group, "Fatal Collisions");
 
   // Render all DC objects
   dc.renderAll();
@@ -483,9 +513,9 @@ cfsparkline.drawsparkline = function(cf_sparkline, cf_group){
 //---------------------------------------------------------------------------------//
 //                             CF DRAW LINE CHART
 //---------------------------------------------------------------------------------//
-cfsparkline.drawlinechart = function(cf_linechart, cf_rangechart, cf_group){
+cfsparkline.drawlinechart = function(cf_linechart, cf_rangechart, cf_group, attribute_name){
   // log("Drawing Line Chart", "cfsparkline.drawlinechart");
-  var datelabel = d3.time.format("%a %e %b");
+  var datelabel = d3.time.format("%a, %b %e, %Y");
   cf_linechart
     .width(960)
     .height(120)
@@ -500,17 +530,22 @@ cfsparkline.drawlinechart = function(cf_linechart, cf_rangechart, cf_group){
     .renderHorizontalGridLines(true)    
     .brushOn(false)
     .dimension(cf_time_dim)
-    .title(function(d){return d.label;})
     .rangeChart(cf_rangechart)
     .title(function(d){
-      return datelabel(d.data.key)
-      + "\nNumber of Incidents: " + d.data.value;
+      return datelabel(d.data.key) + "\nNumber of Incidents: " + d.data.value + "\nAttribute: " + attribute_name + "\n";
       })
     .elasticY(true)
-    .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts;})))
+    .x(d3.time.scale().domain(d3.extent(cfsparkline.dataset, function(d) { return d.ts2;})))
+    //.x(d3.time.scale().domain([new Date(2012, 06, 01), new Date(2015, 04, 19)]))
     .xAxis();
 }
 
+
+
+// last day of a week, d.last_day
+// day of a week, 
+// year, d.year
+// attribute, d
 
 
 
@@ -527,6 +562,9 @@ barchart.draw = function(id){
 
 
 var formatPercent = d3.format(".0%");
+
+// var datelabel = d3.time.format("%a, %b %e, %Y");
+var datelabel = d3.time.format("%m/%d/%Y");
 
 var x = d3.scale.ordinal()
     .rangeRoundBands([0, barchart.width], .1, .1);
@@ -597,9 +635,11 @@ var yAxis = d3.svg.axis()
                   .style("left", (d3.event.pageX-100) + "px")
                   .style("top", (d3.event.pageY-100) + "px")
                   .text(d.range);
+//!@#
 
-              info.append("p")
-                  .text(formatPercent(d.percent));
+              info.append("p").text(datelabel(most_recent_date)+ ":   " + d.present);
+              info.append("p").text(datelabel(d.past_date) + ":   " + d.past);
+              info.append("p").text("Percent Change: " + formatPercent(d.percent));
           
             })
                 .on('mouseout', function(d){
@@ -622,51 +662,90 @@ barchart.calculatePercentages = function(attribute){
   
   var past, present;
 
-  // Check to see if the time range goes back 1 week
-  if( (selected_index - 1) >= 0 ){
-    past    = parseInt(cfsparkline.dataset[selected_index-1][attribute]);
-    present = parseInt(cfsparkline.dataset[selected_index][attribute]);
-    // Check for divide by 0
-    barchart.p_week = (past == 0 ? 0 : (present - past) / past);
-  }
-  else{
-    barchart.p_week = 0;
-  }
+  // Clear the dataset
+  barchart.dataset = [];
+
+  // Initialize dataset
+  barchart.dataset = [  { range: null, percent: null,past_date: null,past: null, present: null},
+                        { range: null, percent: null,past_date: null,past: null, present: null},
+                        { range: null, percent: null,past_date: null,past: null, present: null},
+                        { range: null, percent: null,past_date: null,past: null, present: null}];
+
+
 
   // Check to see if the time range goes back 1 week
+  if( (selected_index - 1) >= 0 ){
+  
+    past    = parseInt(cfsparkline.dataset[selected_index-1][attribute]);
+    present = parseInt(cfsparkline.dataset[selected_index][attribute]);
+
+    barchart.dataset[0].range = 'Week';
+    barchart.dataset[0].percent = (past == 0 ? 0 : (present - past) / past);
+    barchart.dataset[0].past_date = cfsparkline.dataset[selected_index-1].ts2;
+    barchart.dataset[0].past = cfsparkline.dataset[selected_index-1][attribute];
+    barchart.dataset[0].present = cfsparkline.dataset[selected_index][attribute];
+  }
+  else{
+    barchart.dataset[0].percent = 0;
+  }
+
+  // Check to see if the time range goes back 28 days
   if( (selected_index - 4) >= 0 ){
     past    = parseInt(cfsparkline.dataset[selected_index-4][attribute]);
     present = parseInt(cfsparkline.dataset[selected_index][attribute]);
-    barchart.p_28day = (past == 0 ? 0 : (present - past) / past);
+    
+    barchart.dataset[1].range = '28 Days';
+    barchart.dataset[1].percent = (past == 0 ? 0 : (present - past) / past);
+    barchart.dataset[1].past_date = cfsparkline.dataset[selected_index-4].ts2;
+    barchart.dataset[1].past = cfsparkline.dataset[selected_index-4][attribute];
+    barchart.dataset[1].present = cfsparkline.dataset[selected_index][attribute];
   }
   else{
-    barchart.p_28day = 0;
+    barchart.dataset[1].percent = 0;
   }
 
-  // Check to see if the time range goes back 1 week
+  // Check to see if the time range goes back 1 year
   if( (selected_index - 52) >= 0 ){
     past    = parseInt(cfsparkline.dataset[selected_index-52][attribute]);
     present = parseInt(cfsparkline.dataset[selected_index][attribute]);
-    barchart.p_1year = (past == 0 ? 0 : (present - past) / past);
+    
+
+    barchart.dataset[2].range = '1 Year';
+    barchart.dataset[2].percent = (past == 0 ? 0 : (present - past) / past);
+    barchart.dataset[2].past_date = cfsparkline.dataset[selected_index-52].ts2;
+    barchart.dataset[2].past = cfsparkline.dataset[selected_index-52][attribute];
+    barchart.dataset[2].present = cfsparkline.dataset[selected_index][attribute];
   }
   else{
-    barchart.p_1year = 0;
+    barchart.dataset[2].percent = 0;
   }
 
-  // Check to see if the time range goes back 1 week
+  // Check to see if the time range goes back 2 years
   if( (selected_index - 104) >= 0 ){
     past    = parseInt(cfsparkline.dataset[selected_index-104][attribute]);
     present = parseInt(cfsparkline.dataset[selected_index][attribute]);
-    barchart.p_2year = (past == 0 ? 0 : (present - past) / past);
+    
+
+    barchart.dataset[3].range = '2 Year';
+    barchart.dataset[3].percent = (past == 0 ? 0 : (present - past) / past);
+    barchart.dataset[3].past_date = cfsparkline.dataset[selected_index-104].ts2;
+    barchart.dataset[3].past = cfsparkline.dataset[selected_index-104][attribute];
+    barchart.dataset[3].present = cfsparkline.dataset[selected_index][attribute];
   }
   else{
-    barchart.p_2year = 0;
+    barchart.dataset[3].percent = 0;
   }
 
-  barchart.dataset = [  {range: 'Week', percent: barchart.p_week},
-                        {range: '28 Days',       percent: barchart.p_28day},
-                        {range: '1 Year',       percent: barchart.p_1year},
-                        {range: '2 Years',       percent: barchart.p_2year}];
-
-  // console.log(barchart.p_week, barchart.p_28day, barchart.p_1year, barchart.p_2year);
+  // TODO: add the additional tool tip info into this dataset
+  // TODO: add the numbers for both dates
+  // TODO: fix this redundant code
+  // TODO: Change the date format
 }
+
+
+
+
+
+
+
+
