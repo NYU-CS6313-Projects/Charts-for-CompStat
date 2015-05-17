@@ -267,10 +267,10 @@ cfdates.loadCSV = function(filename){
         {
           cfdates.dataset.push({
             all_collisions:       +d.all_collisions,
-            injury_collisions:    +d.injury_collisions,
-            fatal_collisions:     +d.fatal_collisions,
-            injures:              +d.injures,
-            fatalities:           +d.fatalities,
+            injury_collisions:    +d.injures,
+            fatal_collisions:     +d.fatalities,
+            injures:              +d.injury_collisions, // wrong field name
+            fatalities:           +d.fatal_collisions,  // wrong field name
             cyclists_involved:    +d.cyclists_involved,
             pedestrians_involved: +d.pedestrians_involved,
             year:                 +d.year,
