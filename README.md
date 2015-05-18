@@ -4,4 +4,6 @@ This is an ongoing project aims to enhance the NYPD performance analysis by deve
 
 Use this [notebook](http://nbviewer.ipython.org/github/NYU-CS6313-Projects/sp2015-group23/blob/master/data/data_explr.ipynb) to see how the crash data looks like. 
 
-A live demo can be found [here] (http://nyu-cs6313-projects.github.io/Charts-for-CompStat/).
+The visualization tool can be found [here] (http://nyu-cs6313-projects.github.io/Charts-for-CompStat/).
+
+A live demo can be found [here] (https://vimeo.com/128094712).
